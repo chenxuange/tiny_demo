@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.tiny_demo.mapper.UmsAdminMapper">
+
+    <resultMap id="UmsAdminMap" type="com.example.tiny_demo.model.UmsAdmin">
+        <id column="id" property="id" />
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="icon" property="icon"/>
+        <result column="email" property="icon"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="note" property="note"/>
+        <result column="create_time" property="createTime"/>
+        <result column="login_time" property="loginTime"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <select id="selectList" resultMap="UmsAdminMap">
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        from ums_admin
+        where 1= 1
+        <if test="umsAdmin.id != null">
+            and id = #{umsAdmin.id}
+        </if>
+        <if test="umsAdmin.username != null">
+            and username = #{umsAdmin.username}
+        </if>
+        <if test="umsAdmin.password != null">
+            and password = #{umsAdmin.password}
+        </if>
+        <if test="umsAdmin.icon != null">
+            and icon = #{umsAdmin.icon}
+        </if>
+        <if test="umsAdmin.email != null">
+            and email = #{umsAdmin.email}
+        </if>
+        <if test="umsAdmin.nickName != null">
+            and nick_name = #{umsAdmin.nickName}
+        </if>
+        <if test="umsAdmin.note != null">
+            and note = #{umsAdmin.note}
+        </if>
+        <if test="umsAdmin.createTime != null">
+            and create_time = #{umsAdmin.createTime}
+        </if>
+        <if test="umsAdmin.loginTime != null">
+            and login_time = #{umsAdmin.loginTime}
+        </if>
+        <if test="umsAdmin.status != null">
+            and status = #{umsAdmin.status}
+        </if>
+    </select>
+</mapper>
