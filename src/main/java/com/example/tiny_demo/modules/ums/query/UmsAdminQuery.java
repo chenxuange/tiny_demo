@@ -1,4 +1,4 @@
-package com.example.tiny_demo.query;
+package com.example.tiny_demo.modules.ums.query;
 
 import lombok.Data;
 import lombok.Getter;

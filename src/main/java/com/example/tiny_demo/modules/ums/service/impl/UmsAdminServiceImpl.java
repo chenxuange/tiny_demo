@@ -1,11 +1,11 @@
-package com.example.tiny_demo.service.impl;
+package com.example.tiny_demo.modules.ums.service.impl;
 
-import com.example.tiny_demo.dto.UmsAdminParam;
-import com.example.tiny_demo.dto.UpdateAdminPasswordParam;
-import com.example.tiny_demo.model.UmsAdmin;
-import com.example.tiny_demo.model.UmsResource;
-import com.example.tiny_demo.model.UmsRole;
-import com.example.tiny_demo.service.UmsAdminService;
+import com.example.tiny_demo.modules.ums.UmsAdminParam;
+import com.example.tiny_demo.modules.ums.UpdateAdminPasswordParam;
+import com.example.tiny_demo.modules.ums.model.UmsAdmin;
+import com.example.tiny_demo.modules.ums.model.UmsResource;
+import com.example.tiny_demo.modules.ums.model.UmsRole;
+import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.github.pagehelper.Page;
 import org.springframework.stereotype.Service;
 

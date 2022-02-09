@@ -1,13 +1,11 @@
 package com.example.tiny_demo.mapper;
 
-import com.example.tiny_demo.model.UmsAdmin;
-import com.example.tiny_demo.query.UmsAdminQuery;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import com.example.tiny_demo.modules.ums.model.UmsAdmin;
+import com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper;
+import com.example.tiny_demo.modules.ums.query.UmsAdminQuery;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 

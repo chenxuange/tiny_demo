@@ -1,4 +1,4 @@
-package com.example.tiny_demo.model;
+package com.example.tiny_demo.modules.ums.model;
 
 import lombok.Data;
 

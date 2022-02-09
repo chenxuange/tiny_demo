@@ -1,10 +1,10 @@
-package com.example.tiny_demo.service;
+package com.example.tiny_demo.modules.ums.service;
 
-import com.example.tiny_demo.dto.UmsAdminParam;
-import com.example.tiny_demo.dto.UpdateAdminPasswordParam;
-import com.example.tiny_demo.model.UmsAdmin;
-import com.example.tiny_demo.model.UmsResource;
-import com.example.tiny_demo.model.UmsRole;
+import com.example.tiny_demo.modules.ums.UmsAdminParam;
+import com.example.tiny_demo.modules.ums.UpdateAdminPasswordParam;
+import com.example.tiny_demo.modules.ums.model.UmsAdmin;
+import com.example.tiny_demo.modules.ums.model.UmsResource;
+import com.example.tiny_demo.modules.ums.model.UmsRole;
 import com.github.pagehelper.Page;
 import org.springframework.transaction.annotation.Transactional;
 

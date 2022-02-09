@@ -1,4 +1,4 @@
-package com.example.tiny_demo.dto;
+package com.example.tiny_demo.modules.ums;
 
 public class UpdateAdminPasswordParam {
     private String username;
