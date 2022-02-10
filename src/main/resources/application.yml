@@ -7,10 +7,13 @@ spring:
     url: jdbc:mysql://localhost:3306/mall_tiny?serverTimezone=Asia/Shanghai
     username: root
     password: 123456
-#    password: zzh1995@
+  #    password: zzh1995@
   main:
     allow-circular-references: true
-
+#    password: zzh1995@
 mybatis:
   mapper-locations:
-    - classpath:mapper/**/*.xml
+    - classpath:/mapper/**/*.xml
+logging:
+  level:
+    com.example.tiny_demo.modules.ums: debug

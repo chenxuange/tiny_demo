@@ -9,4 +9,6 @@ import java.util.List;
 public interface UmsAdminMapper {
 
     List<UmsAdmin> selectList(@Param("umsAdmin") UmsAdminQuery umsAdmin);
+
+
 }
