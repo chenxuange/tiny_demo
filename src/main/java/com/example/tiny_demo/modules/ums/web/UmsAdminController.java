@@ -1,13 +1,19 @@
 package com.example.tiny_demo.modules.ums.web;
 
 import com.example.tiny_demo.common.api.CommonResult;
+import com.example.tiny_demo.common.api.ResultCode;
 import com.example.tiny_demo.modules.ums.UmsAdminParam;
+import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
+import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
+import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.stereotype.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.util.List;
 
 @Api(tags = "UmsAdminController", description = "后台用户管理")
@@ -15,16 +21,25 @@ import java.util.List;
 @RequestMapping("/admin")
 public class UmsAdminController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UmsAdminController.class);
+    @Autowired
+    private UmsAdminService adminService;
+
 
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
-    public CommonResult userInfo(@PathVariable String id) {
-        return CommonResult.success(id);
+    public CommonResult userInfo(@PathVariable Integer id) {
+        UmsAdminDO umsAdminDO = adminService.get(id);
+        return CommonResult.success(umsAdminDO);
     }
 
     @ApiOperation(value = "删除指定用户信息")
     @PostMapping("/delete/{id}")
-    public CommonResult delete(@PathVariable String id) {
+    public CommonResult delete(@PathVariable Integer id) {
+        boolean delete = adminService.delete(id);
+        if(!delete) {
+            return CommonResult.fail(null);
+        }
         return CommonResult.success(id);
     }
 
@@ -62,14 +77,19 @@ public class UmsAdminController {
 
     @ApiOperation(value = "用户注册")
     @PostMapping("/register")
-    public CommonResult register(@RequestBody UmsAdminParam adminParam) {
+    public CommonResult register(@Validated @RequestBody UmsAdminParam adminParam) {
+        UmsAdminDO register = adminService.register(adminParam);
+        if (register == null) {
+            return CommonResult.fail(ResultCode.ADMIN_EXIST_ERROR.getCode(), ResultCode.ADMIN_EXIST_ERROR.getMessage(), null);
+        }
         return CommonResult.success(adminParam);
     }
 
     @ApiOperation("获取指定用户的角色")
     @GetMapping("/role/{adminId}")
-    public CommonResult roleInfo(@PathVariable String adminId) {
-        return CommonResult.success(adminId);
+    public CommonResult roleInfo(@PathVariable Integer adminId) {
+        List<UmsRoleDo> roleList = adminService.getRoleList(adminId);
+        return CommonResult.success(roleList);
     }
 
     @ApiOperation(value = "给用户分配角色")

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper">
-    <resultMap id="UmsAdminMap" type="com.example.tiny_demo.modules.ums.model.UmsAdmin">
+    <resultMap id="UmsAdminMap" type="com.example.tiny_demo.modules.ums.model.UmsAdminDO">
 
-        <id column="id" property="id" />
+        <id column="id" property="id"/>
         <result column="username" property="username"/>
         <result column="password" property="password"/>
         <result column="icon" property="icon"/>
@@ -14,6 +14,21 @@
         <result column="login_time" property="loginTime"/>
         <result column="status" property="status"/>
     </resultMap>
+
+    <insert id="insert">
+        INSERT INTO
+            ums_admin
+            ( username, password, icon, email, nick_name, note, create_time, status )
+            VALUES
+                   ( #{username}, #{password}, #{icon}, #{email}, #{nickName}, #{note}, #{createTime}, #{status} )
+    </insert>
+    <delete id="deleteByIdBatch" parameterType="list">
+        DELETE FROM ums_admin
+        WHERE id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="selectList" resultMap="UmsAdminMap">
         select id, username, password, icon, email, nick_name, note, create_time, login_time, status
@@ -49,5 +64,13 @@
         <if test="umsAdmin.status != null">
             and status = #{umsAdmin.status}
         </if>
+    </select>
+    <select id="selectByIdBatch" resultMap="UmsAdminMap">
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        from ums_admin
+        where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>

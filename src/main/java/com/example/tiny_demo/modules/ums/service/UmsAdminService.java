@@ -2,9 +2,9 @@ package com.example.tiny_demo.modules.ums.service;
 
 import com.example.tiny_demo.modules.ums.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.UpdateAdminPasswordParam;
-import com.example.tiny_demo.modules.ums.model.UmsAdmin;
+import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsResource;
-import com.example.tiny_demo.modules.ums.model.UmsRole;
+import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
 import com.github.pagehelper.Page;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +17,13 @@ public interface UmsAdminService {
     /**
      * 根据用户名获取后台管理员
      */
-    UmsAdmin getAdminByUsername(String username);
+    UmsAdminDO getAdminByUsername(String username);
 
     /**
      * 注册功能
      */
-    UmsAdmin register(UmsAdminParam umsAdminParam);
+    @Transactional
+    UmsAdminDO register(UmsAdminParam umsAdminParam);
 
     /**
      * 登录功能
@@ -41,17 +42,19 @@ public interface UmsAdminService {
     /**
      * 根据用户名或昵称分页查询用户
      */
-    Page<UmsAdmin> list(String keyword, Integer pageSize, Integer pageNum);
+    Page<UmsAdminDO> list(String keyword, Integer pageSize, Integer pageNum);
 
     /**
      * 修改指定用户信息
      */
-    boolean update(Long id, UmsAdmin admin);
+    boolean update(Long id, UmsAdminDO admin);
 
     /**
      * 删除指定用户
+     * @param id
      */
-    boolean delete(Long id);
+    @Transactional
+    boolean delete(Integer id);
 
     /**
      * 修改用户角色关系
@@ -61,8 +64,9 @@ public interface UmsAdminService {
 
     /**
      * 获取用户对于角色
+     * @param adminId
      */
-    List<UmsRole> getRoleList(Long adminId);
+    List<UmsRoleDo> getRoleList(Integer adminId);
 
     /**
      * 获取指定用户的可访问资源
@@ -73,6 +77,13 @@ public interface UmsAdminService {
      * 修改密码
      */
     int updatePassword(UpdateAdminPasswordParam updatePasswordParam);
+
+    /**
+     * 根基用户id获取用户
+     * @param id
+     * @return
+     */
+    UmsAdminDO get(Integer id);
 
     /**
      * 获取用户信息

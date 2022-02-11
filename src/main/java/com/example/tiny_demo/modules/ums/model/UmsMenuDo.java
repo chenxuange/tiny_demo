@@ -7,7 +7,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-@ApiModel(value = "菜单")
+@ApiModel(value = "UmsMenuDo对象", description = "后台菜单表")
 @Data
 public class UmsMenuDo {
     @ApiModelProperty(value = "主键")

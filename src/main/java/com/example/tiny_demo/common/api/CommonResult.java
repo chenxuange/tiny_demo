@@ -18,13 +18,24 @@ public class CommonResult<T> {
         this.data = data;
     }
 
+
+
     // 默认成功返回
     public static <T> CommonResult<T> success(T data) {
         return new CommonResult<T>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 
+    // 自定义失败返回
+    public static <T> CommonResult<T> fail(long code, String message, T data) {
+        return new CommonResult<T>(code, message, data);
+    }
+
     // 默认失败返回
     public static <T> CommonResult<T> fail(T data) {
         return new CommonResult<T>(ResultCode.FAILED.getCode(), ResultCode.FAILED.getMessage(), data);
+    }
+    // 校验失败返回
+    public static <T> CommonResult<T> validateFailed(String message, T data) {
+        return new CommonResult<>(ResultCode.VALIDATE_FAILED.getCode(), message, data);
     }
 }
