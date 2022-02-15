@@ -1,4 +1,4 @@
-package com.example.tiny_demo.modules.ums;
+package com.example.tiny_demo.modules.ums.dto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 用户参数类
  */
-@ApiModel(value = "UmsAdminParam", description = "前端用户注册参数")
+@ApiModel(value = "UmsAdminParam", description = "前端用户参数")
 @Data
 public class UmsAdminParam {
     @NotBlank
@@ -21,4 +21,5 @@ public class UmsAdminParam {
     private String email;
     private String nickName;
     private String note;
+    private Integer status;
 }

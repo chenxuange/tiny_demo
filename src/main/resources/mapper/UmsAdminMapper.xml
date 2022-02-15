@@ -16,12 +16,37 @@
     </resultMap>
 
     <insert id="insert">
-        INSERT INTO
-            ums_admin
-            ( username, password, icon, email, nick_name, note, create_time, status )
-            VALUES
-                   ( #{username}, #{password}, #{icon}, #{email}, #{nickName}, #{note}, #{createTime}, #{status} )
+        INSERT INTO ums_admin
+            (username, password, icon, email, nick_name, note, create_time, status)
+        VALUES (#{username}, #{password}, #{icon}, #{email}, #{nickName}, #{note}, #{createTime}, #{status})
     </insert>
+    <update id="updateById">
+        update ums_admin
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="icon != null">
+                icon = #{icon},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName},
+            </if>
+            <if test="note != null">
+                note = #{note},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
     <delete id="deleteByIdBatch" parameterType="list">
         DELETE FROM ums_admin
         WHERE id in
@@ -72,5 +97,12 @@
         <foreach collection="list" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </select>
+    <select id="selectByKeyword" resultMap="UmsAdminMap">
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        from ums_admin
+        <if test="keyword != null">
+            where username like #{keyword} or nick_name like #{keyword}
+        </if>
     </select>
 </mapper>

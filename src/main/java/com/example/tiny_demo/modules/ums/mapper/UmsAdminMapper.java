@@ -1,13 +1,14 @@
 package com.example.tiny_demo.modules.ums.mapper;
 
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
-import com.example.tiny_demo.modules.ums.query.UmsAdminQuery;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface UmsAdminMapper {
+
+    List<UmsAdminDO> selectByKeyword(String keyword);
 
     /**
      * 根据查询条件查询用户
@@ -34,4 +35,11 @@ public interface UmsAdminMapper {
      * @param ids
      */
     int deleteByIdBatch(ArrayList<Integer> ids);
+
+    /**
+     * 根据用户id更新用户
+     * @param adminDO
+     * @return
+     */
+    int updateById(UmsAdminDO adminDO);
 }

@@ -1,6 +1,8 @@
 package com.example.tiny_demo.common.exception;
 
 import com.example.tiny_demo.common.api.CommonResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -22,6 +24,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    // 处理自定义异常
+    @ExceptionHandler(ApiException.class)
+    public CommonResult handleApiException(ApiException e) {
+        if(e.getErrorCode() == null) {
+            // 若没有错误码，则是传回了错误信息
+            return CommonResult.fail(e.getMessage(), null);
+        }
+        return CommonResult.fail(e.getErrorCode(), null);
+    }
+
     // 处理入参校验异常， 暂时没有采用form-data格式，而是json,只用写一种对应方式
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public CommonResult handleBindException(MethodArgumentNotValidException e) {
@@ -39,7 +53,8 @@ public class GlobalExceptionHandler {
     // 处理所有异常
     @ExceptionHandler(Exception.class)
     public CommonResult handleAll(Exception e) {
-        System.out.println("handleAll "+ e.getClass().getName());
+        logger.warn("handleAll, {}", e.getClass().getName());
+        e.printStackTrace();
         return CommonResult.fail(e.getMessage());
     }
 }
