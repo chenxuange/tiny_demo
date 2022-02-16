@@ -37,4 +37,10 @@ public interface UmsMenuMapper {
      * @param umsMenuDo
      */
     void update(UmsMenuDo umsMenuDo);
+
+    /**
+     * 根据角色id选择关联菜单
+     * @param roleId
+     */
+    List<UmsMenuDo> getMenuListByRoleId(Integer roleId);
 }

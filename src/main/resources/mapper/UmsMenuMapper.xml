@@ -84,5 +84,11 @@
             and parent_id = #{parentId}
         </if>
     </select>
+    <select id="getMenuListByRoleId" resultMap="UmsMenuDoMap">
+        select m.*
+        from ums_role_menu_relation rm
+                 LEFT JOIN ums_menu m on m.id = rm.menu_id
+        where rm.role_id = #{roleId}
+    </select>
 
 </mapper>

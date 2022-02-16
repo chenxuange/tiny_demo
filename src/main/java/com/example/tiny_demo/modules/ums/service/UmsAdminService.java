@@ -4,9 +4,8 @@ import com.example.tiny_demo.modules.ums.dto.UmsAdminLoginParam;
 import com.example.tiny_demo.modules.ums.dto.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
-import com.example.tiny_demo.modules.ums.model.UmsResource;
+import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageInfo;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +70,7 @@ public interface UmsAdminService {
     /**
      * 获取指定用户的可访问资源
      */
-    List<UmsResource> getResourceList(Long adminId);
+    List<UmsResourceDo> getResourceList(Long adminId);
 
     /**
      * 修改密码

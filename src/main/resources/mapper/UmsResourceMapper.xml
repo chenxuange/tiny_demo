@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsResourceMapper">
+    <resultMap id="UmsResourceMap" type="com.example.tiny_demo.modules.ums.model.UmsResourceDo">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="description" property="description"/>
+        <result column="category_id" property="categoryId"/>
+    </resultMap>
+    <insert id="insert">
+        INSERT INTO ums_resource
+            (create_time, name, url, description, category_id)
+        VALUES (#{createTime}, #{name}, #{url}, #{description}, #{categoryId})
+    </insert>
+    <update id="updateById">
+        update ums_resource
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="url != null">
+                url = #{url},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteById">
+        delete
+        from ums_resource
+        where id = #{id}
+    </delete>
+    <select id="selectList" resultMap="UmsResourceMap">
+        SELECT id,create_time,name,url,description,category_id
+        FROM ums_resource
+        where 1 = 1
+        <if test="id != null">
+            and id = #{id},
+        </if>
+        <if test="createTime != null">
+            and create_time = #{createTime},
+        </if>
+        <if test="name != null">
+            and name like #{name},
+        </if>
+        <if test="url != null">
+            and url like #{url},
+        </if>
+        <if test="description != null">
+            and description = #{description},
+        </if>
+        <if test="categoryId != null">
+            and category_id = #{categoryId}
+        </if>
+    </select>
+    <select id="selectById" resultMap="UmsResourceMap">
+        SELECT id, create_time, name, url, description, category_id
+        FROM ums_resource
+        where id = #{id}
+    </select>
+    <select id="getResourceListByRoleId" resultType="com.example.tiny_demo.modules.ums.model.UmsResourceDo">
+        select r.*
+        from ums_role_resource_relation rr
+                 LEFT JOIN ums_resource r on r.id = rr.resource_id
+        where rr.role_id = #{roleId}
+    </select>
+    <select id="selectByIdBatch" resultType="com.example.tiny_demo.modules.ums.model.UmsResourceDo">
+        SELECT id, create_time, name, url, description, category_id
+        FROM ums_resource
+        where id in
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+
+    </select>
+</mapper>

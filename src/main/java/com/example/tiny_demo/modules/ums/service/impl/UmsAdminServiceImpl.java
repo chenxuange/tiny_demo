@@ -10,11 +10,10 @@ import com.example.tiny_demo.modules.ums.mapper.UmsAdminRoleRMapper;
 import com.example.tiny_demo.modules.ums.mapper.UmsRoleMapper;
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsAdminRoleR;
-import com.example.tiny_demo.modules.ums.model.UmsResource;
+import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.example.tiny_demo.security.utils.JwtTokenUtil;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -125,7 +124,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     }
 
     @Override
-    public List<UmsResource> getResourceList(Long adminId) {
+    public List<UmsResourceDo> getResourceList(Long adminId) {
         return null;
     }
 

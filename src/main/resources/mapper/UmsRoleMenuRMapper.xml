@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsRoleMenuRMapper">
+    <resultMap id="UmsRoleMenuRMap" type="com.example.tiny_demo.modules.ums.model.UmsRoleMenuR">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="menu_id" property="menuId"/>
+    </resultMap>
+    <insert id="insertBatch">
+        insert into ums_role_menu_relation
+        (role_id, menu_id)
+        values
+        <foreach collection="list" item="model" separator=",">
+            (#{model.roleId}, #{model.menuId})
+        </foreach>
+    </insert>
+    <delete id="deleteByRoleId">
+        delete
+        from ums_role_menu_relation
+        where role_id = #{roleId}
+    </delete>
+</mapper>

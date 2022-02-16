@@ -55,6 +55,6 @@ public class GlobalExceptionHandler {
     public CommonResult handleAll(Exception e) {
         logger.warn("handleAll, {}", e.getClass().getName());
         e.printStackTrace();
-        return CommonResult.fail(e.getMessage());
+        return CommonResult.fail(e.getClass().getName());
     }
 }

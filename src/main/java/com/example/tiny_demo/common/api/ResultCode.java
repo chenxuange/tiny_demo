@@ -5,7 +5,7 @@ package com.example.tiny_demo.common.api;
  */
 public enum ResultCode implements IErrorCode{
     SUCCESS(200, "恭喜您操作成功"),
-    FAILED(500, "操作失败，请联系管理员"),
+    FAILED(500, "操作失败，请联系valerius"),
     // 自定义错误操作码
     ADMIN_EXIST_ERROR(600, "当前用户名已经注册"),
     USERNAME_OR_PASSWORD_ERROR(601, "用户名或密码错误"),

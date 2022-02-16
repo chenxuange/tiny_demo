@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsRoleResourceRMapper">
+    <resultMap id="UmsAdminRoleRMap" type="com.example.tiny_demo.modules.ums.model.UmsRoleResourceR">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="resource_id" property="resourceId"/>
+    </resultMap>
+    <insert id="insertBatch">
+        insert into ums_role_resource_relation
+        (role_id, resource_id)
+        values
+        <foreach collection="list" item="model" separator=",">
+            (#{model.roleId}, #{model.resourceId})
+        </foreach>
+    </insert>
+    <delete id="deleteByRoleId">
+        delete
+        from ums_role_resource_relation
+        where role_id = #{roleId}
+    </delete>
+</mapper>

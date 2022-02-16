@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsResourceCategoryMapper">
+    <resultMap id="UmsResourceCategoryMap" type="com.example.tiny_demo.modules.ums.model.UmsResourceCategoryDo">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="name" property="name"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+    <insert id="insert">
+        INSERT INTO ums_resource_category
+            (create_time, name, sort)
+        VALUES (#{createTime}, #{name}, #{sort})
+    </insert>
+    <update id="updateById">
+        update ums_resource_category
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="sort != null">
+                sort = #{sort}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteById">
+        delete
+        from ums_resource_category
+        where id = #{id}
+    </delete>
+    <!--    针对这种and、where的处理，可使用动态SQL的where元素，
+    where元素主要用来简化SQL语句中的where条件判断，并智能的处理and和or，不必担心多余关键字导致的语法错误
+    即，以后不需要使用 1 = 1 来避免多个and关键字问题-->
+    <select id="selectList" resultMap="UmsResourceCategoryMap">
+        SELECT id,create_time,name,sort
+        FROM ums_resource_category
+        <where>
+            <if test="id != null">
+                and id = #{id},
+            </if>
+            <if test="name != null">
+                and name # #{name}
+            </if>
+            <if test="sort != null">
+                and sort = #{sort}
+            </if>
+        </where>
+        ORDER BY sort DESC
+    </select>
+    <select id="selectById" resultType="com.example.tiny_demo.modules.ums.model.UmsResourceCategoryDo">
+        SELECT id, create_time, name, sort
+        FROM ums_resource_category
+        where id = #{id}
+    </select>
+
+</mapper>

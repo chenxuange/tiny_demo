@@ -13,7 +13,7 @@ public class UmsRoleDo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    private Long id;
+    private Integer id;
 
     @ApiModelProperty("角色名称")
     private String name;
