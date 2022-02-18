@@ -1,30 +1,48 @@
 package com.example.tiny_demo.security.config;
 
 
+import com.example.tiny_demo.common.api.CommonResult;
+import com.example.tiny_demo.security.component.JwtAuthenticationTokenFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import springfox.documentation.spring.web.json.JsonSerializer;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
- * 对SpringSecurity的配置的扩展，后续支持自定义白名单资源路径和动态权限控制
+ * 对SpringSecurity的基础配置，后续支持自定义白名单资源路径和动态权限控制
  */
-@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    @Autowired
+    private AccessDeniedHandler restfulAccessDeniedHandler;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder().encode("123")).roles("admin");
-    }
+    @Autowired
+    private AuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    @Autowired
+    private IgnoreUrlsConfig ignoreUrlsConfig;
+
 
     /**
      * 实际上，spring-security中这个配置生效，（不去重写本方法）就会存在一种默认安全实现。
@@ -37,7 +55,82 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        super.configure(http);  // 关闭默认安全配置
-        http.csrf().disable();
+//        http.csrf().disable(); // 关闭跨域请求认证
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
+        // 允许访问不需要保护的资源路径，如swagger，否则swagger接口文档打不开
+        for(String url : ignoreUrlsConfig.getUrls()) {
+            registry.antMatchers(url).permitAll();
+        }
+        // 任何授权请求需要身份认证
+        registry.and()
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
+                // 关闭跨站请求防护及不使用session
+                .and()
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // 自定义权限拒绝处理类\认证失败处理类
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(restfulAccessDeniedHandler)
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                // 自定义权限拦截器JWT过滤器,完成认证
+                .and()
+                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
     }
+
+    @Bean
+    // 没有权限拒绝访问
+    public AccessDeniedHandler restfulAccessDeniedHandler() {
+        return new AccessDeniedHandler() {
+            @Override
+            public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                response.setHeader("Cache-Control","no-cache");
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("application/json");
+                ObjectMapper objectMapper = new ObjectMapper();
+                response.getWriter().println(objectMapper.writeValueAsString(CommonResult.unauthorized(e.getMessage())));
+                response.getWriter().flush();
+            }
+        };
+    }
+
+    /**
+     * 若认证失败，不论是没有相关权限、未登录或登录过期，会抛出对应异常；
+     * 若设置了全局异常处理器处理任意异常，就会有先处理拦截，此时认证失败处理策略就无法再执行
+     */
+    @Bean
+    // 未登录或登录过期
+    public AuthenticationEntryPoint restAuthenticationEntryPoint() {
+        return new AuthenticationEntryPoint() {
+            @Override
+            public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                response.setHeader("Cache-Control","no-cache");
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("application/json");
+                ObjectMapper objectMapper = new ObjectMapper();
+                response.getWriter().println(objectMapper.writeValueAsString(CommonResult.unauthenticated(e.getMessage())));
+                response.getWriter().flush();
+            }
+        };
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        // 内存中设置用户配合默认的安全配置，从而进入登录页面
+//        auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder().encode("123")).roles("admin");
+//    }
 }
 

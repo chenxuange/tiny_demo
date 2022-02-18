@@ -8,6 +8,11 @@ import java.util.List;
 
 public interface UmsAdminMapper {
 
+    /**
+     * 根据用户名或昵称关键字模糊查找用户
+     * @param keyword
+     * @return
+     */
     List<UmsAdminDO> selectByKeyword(String keyword);
 
     /**

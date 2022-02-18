@@ -9,7 +9,9 @@ public enum ResultCode implements IErrorCode{
     // 自定义错误操作码
     ADMIN_EXIST_ERROR(600, "当前用户名已经注册"),
     USERNAME_OR_PASSWORD_ERROR(601, "用户名或密码错误"),
-    VALIDATE_FAILED(400, "参数检验失败");
+    VALIDATE_FAILED(400, "参数检验失败"),
+    UNAUTHENTICATED(401, "当前用户未登录或登录已过期"),
+    UNAUTHORIZED(403, "对不起，您没有相关权限");
     private long code;
     private String message;
     private ResultCode(long code, String message) {

@@ -7,6 +7,7 @@ import com.example.tiny_demo.modules.ums.dto.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
 import com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper;
 import com.example.tiny_demo.modules.ums.mapper.UmsAdminRoleRMapper;
+import com.example.tiny_demo.modules.ums.mapper.UmsResourceMapper;
 import com.example.tiny_demo.modules.ums.mapper.UmsRoleMapper;
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsAdminRoleR;
@@ -39,6 +40,9 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     private UmsRoleMapper roleMapper;
 
     @Autowired
+    private UmsResourceMapper resourceMapper;
+
+    @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
@@ -49,7 +53,13 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public UmsAdminDO getAdminByUsername(String username) {
-        return null;
+        UmsAdminDO query = new UmsAdminDO();
+        query.setUsername(username);
+        List<UmsAdminDO> list = adminMapper.selectList(query);
+        if(CollectionUtils.isEmpty(list)) {
+            return null;
+        }
+        return list.get(0);
     }
 
     @Override
@@ -124,8 +134,9 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     }
 
     @Override
-    public List<UmsResourceDo> getResourceList(Long adminId) {
-        return null;
+    public List<UmsResourceDo> getResourceList(Integer adminId) {
+        List<UmsResourceDo> list = resourceMapper.getResourceList(adminId);
+        return list;
     }
 
     @Override

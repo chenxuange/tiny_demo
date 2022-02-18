@@ -50,11 +50,11 @@ public class GlobalExceptionHandler {
         return CommonResult.validateFailed(message, null);
     }
 
-    // 处理所有异常
-    @ExceptionHandler(Exception.class)
-    public CommonResult handleAll(Exception e) {
-        logger.warn("handleAll, {}", e.getClass().getName());
-        e.printStackTrace();
-        return CommonResult.fail(e.getClass().getName());
-    }
+//    // 处理所有异常
+//    @ExceptionHandler(Exception.class)
+//    public CommonResult handleAll(Exception e) {
+//        logger.warn("GlobalExceptionHandler.handleAll, {}", e.getClass().getName());
+//        e.printStackTrace();
+//        return CommonResult.fail(e.getClass().getName());
+//    }
 }

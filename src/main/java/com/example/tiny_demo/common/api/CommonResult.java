@@ -47,4 +47,14 @@ public class CommonResult<T> {
     public static <T> CommonResult<T> validateFailed(String message, T data) {
         return new CommonResult<>(ResultCode.VALIDATE_FAILED.getCode(), message, data);
     }
+
+    // 没有权限拒绝登录返回
+    public static <T> CommonResult<T> unauthorized( T data) {
+        return new CommonResult<>(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage(), data);
+    }
+
+    public static <T> CommonResult<T> unauthenticated(T data) {
+        return new CommonResult<>(ResultCode.UNAUTHENTICATED.getCode(), ResultCode.UNAUTHENTICATED.getMessage(), data);
+
+    }
 }

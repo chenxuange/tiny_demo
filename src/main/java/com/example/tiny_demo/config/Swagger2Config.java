@@ -19,7 +19,7 @@ public class Swagger2Config extends BaseSwagger2Config {
                 .description("相关接口文档")
                 .contactName("valerius")
                 .version("1.0")
-                .enableSecurity(true)  // TODO 登录认证
+                .enableSecurity(true)  //  登录认证
                 .build();
     }
 }

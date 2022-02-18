@@ -12,6 +12,11 @@ public interface UmsResourceMapper {
      */
     List<UmsResourceDo> selectList(UmsResourceDo umsResourceDo);
 
+    /**
+     * 根据资源id查找资源
+     * @param id
+     * @return
+     */
     List<UmsResourceDo> selectById(Integer id);
 
     /**
@@ -43,4 +48,10 @@ public interface UmsResourceMapper {
      * @param resourceIds
      */
     List<UmsResourceDo> selectByIdBatch(List<Integer> resourceIds);
+
+    /**
+     * 根据用户id获取所有关联资源
+     * @param adminId
+     */
+    List<UmsResourceDo> getResourceList(Integer adminId);
 }

@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRequest;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,15 +48,16 @@ public class UmsAdminController {
     private String tokenHead;
 
 
+    @PreAuthorize("hasAuthority('1:商品品牌管理1')")
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
     public CommonResult userInfo(@PathVariable Integer id) {
         UmsAdminDO umsAdminDO = adminService.get(id);
 
-        // TODO 模拟一个极简用户登录, 待安全功能完备
-        UserDetails userDetails = new User("tom", "", Collections.singleton(() -> null));
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//        // TODO 模拟一个极简用户登录, 待安全功能完备
+//        UserDetails userDetails = new User("tom", "", Collections.singleton(() -> null));
+//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null);
+//        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         return CommonResult.success(umsAdminDO);
     }

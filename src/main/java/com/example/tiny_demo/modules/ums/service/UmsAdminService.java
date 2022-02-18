@@ -62,15 +62,16 @@ public interface UmsAdminService {
     void updateRole(Integer adminId, List<Integer> roleIds);
 
     /**
-     * 获取用户对于角色
+     * 获取用户的所有角色
      * @param adminId
      */
     List<UmsRoleDo> getRoleList(Integer adminId);
 
     /**
-     * 获取指定用户的可访问资源
+     * 获取指定用户id的可访问资源
+     * @param adminId
      */
-    List<UmsResourceDo> getResourceList(Long adminId);
+    List<UmsResourceDo> getResourceList(Integer adminId);
 
     /**
      * 修改密码
@@ -100,8 +101,4 @@ public interface UmsAdminService {
      */
     String login(UmsAdminLoginParam adminLoginParam);
 
-    /**
-     * 获取用户信息
-     */
-//    UserDetails loadUserByUsername(String username);
 }
