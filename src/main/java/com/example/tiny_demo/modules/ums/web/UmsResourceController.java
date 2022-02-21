@@ -52,7 +52,7 @@ public class UmsResourceController {
     @PostMapping("/create")
     public CommonResult create(@RequestBody UmsResourceParam resourceParam) {
         UmsResourceDo umsResourceDo = resourceService.create(resourceParam);
-        // TODO 后续更新数据源
+        // TODO 添加动态权限时需更新数据源
         return CommonResult.success(umsResourceDo);
     }
 

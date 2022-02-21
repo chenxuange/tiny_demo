@@ -90,5 +90,13 @@
                  LEFT JOIN ums_menu m on m.id = rm.menu_id
         where rm.role_id = #{roleId}
     </select>
+    <select id="getMenuList" resultType="com.example.tiny_demo.modules.ums.model.UmsMenuDo">
+        select m.* from
+            ums_admin a
+                LEFT JOIN ums_admin_role_relation ar on a.id = ar.admin_id
+                left join ums_role_menu_relation rm on rm.role_id = ar.role_id
+                left join ums_menu m on rm.menu_id = m.id
+        where a.id = #{adminId}
+    </select>
 
 </mapper>

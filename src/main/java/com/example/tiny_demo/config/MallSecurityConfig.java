@@ -25,20 +25,20 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class MallSecurityConfig extends SecurityConfig {
-    @Autowired
-    private UmsAdminService umsAdminService;
-
-    // UserDetailsService的loadUserByUsername方法实现,根据用户名获取用户信息封装成UserDetails
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return (username -> {
-            UmsAdminDO admin = umsAdminService.getAdminByUsername(username);
-            if(admin == null) {
-                throw  new UsernameNotFoundException("用户名或密码错误");
-            }
-            List<UmsResourceDo> resourceList = umsAdminService.getResourceList(admin.getId());
-            return new LoginUserDetails(admin, resourceList);
-        });
-    }
+//    @Autowired
+//    private UmsAdminService umsAdminService;
+//
+//    // UserDetailsService的loadUserByUsername方法实现,根据用户名获取用户信息封装成UserDetails
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return (username -> {
+//            UmsAdminDO admin = umsAdminService.getAdminByUsername(username);
+//            if(admin == null) {
+//                throw  new UsernameNotFoundException("用户名或密码错误");
+//            }
+//            List<UmsResourceDo> resourceList = umsAdminService.getResourceList(admin.getId());
+//            return new LoginUserDetails(admin, resourceList);
+//        });
+//    }
 
 }

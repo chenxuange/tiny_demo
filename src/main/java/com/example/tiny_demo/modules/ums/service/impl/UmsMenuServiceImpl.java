@@ -1,5 +1,7 @@
 package com.example.tiny_demo.modules.ums.service.impl;
 
+import com.example.tiny_demo.common.api.ResultCode;
+import com.example.tiny_demo.common.exception.Asserts;
 import com.example.tiny_demo.modules.ums.dto.UmsMenuNode;
 import com.example.tiny_demo.modules.ums.mapper.UmsMenuMapper;
 import com.example.tiny_demo.modules.ums.model.UmsMenuDo;
@@ -87,7 +89,7 @@ public class UmsMenuServiceImpl implements UmsMenuService {
         integers.add(id);
         List<UmsMenuDo> menuDoList = menuMapper.selectByIdBatch(integers);
         if(CollectionUtils.isEmpty(menuDoList)) {
-            // TODO 菜单不存在，应该跑出错误
+            Asserts.fail(ResultCode.MENU_NOT_FOUND);
         }else{
             umsMenuDo.setId(id);
             menuMapper.update(umsMenuDo);
@@ -101,7 +103,7 @@ public class UmsMenuServiceImpl implements UmsMenuService {
         integers.add(id);
         List<UmsMenuDo> menuDoList = menuMapper.selectByIdBatch(integers);
         if(CollectionUtils.isEmpty(menuDoList)) {
-            // TODO 菜单不存在，应该跑出错误
+            Asserts.fail(ResultCode.MENU_NOT_FOUND);
         }else{
             UmsMenuDo umsMenuDo = new UmsMenuDo();
             umsMenuDo.setId(id);

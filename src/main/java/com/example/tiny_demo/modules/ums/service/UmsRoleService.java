@@ -86,4 +86,11 @@ public interface UmsRoleService {
      * @return
      */
     List<UmsRoleResourceR> allocResource(Integer roleId, List<Integer> resourceIds);
+
+    /**
+     * 根据用户id查找所有菜单
+     * @param id
+     * @return
+     */
+    List<UmsMenuDo> getMenuList(Integer adminId);
 }

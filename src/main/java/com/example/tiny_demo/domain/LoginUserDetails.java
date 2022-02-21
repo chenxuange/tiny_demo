@@ -62,6 +62,7 @@ public class LoginUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
+        // 账号可用
         return Objects.equals(1, admin.getStatus());
     }
 }

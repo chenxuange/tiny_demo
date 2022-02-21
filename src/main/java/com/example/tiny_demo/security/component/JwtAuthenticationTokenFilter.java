@@ -1,5 +1,6 @@
 package com.example.tiny_demo.security.component;
 
+import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.example.tiny_demo.security.utils.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,9 @@ import java.io.IOException;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
+
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UmsAdminService adminService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Value("${jwt.tokenHeader}")
@@ -44,17 +46,20 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             // 从jwtToken中取出用户名
             String username = jwtTokenUtil.getUserNameFromToken(authToken);
             LOGGER.info("checking username:{}", username);
+            // TODO 这里先前设置的authentication无效，是什么原因
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                LOGGER.debug("authentication, {}", (Object) null);
                 // 根据用户名查询并封装
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = adminService.loadUserByUsername(username);
                 if(jwtTokenUtil.validateToken(authToken, userDetails)) {
                     String token = jwtTokenUtil.generateToken(userDetails);
                     LOGGER.info("authenticated user:{}", username);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     // TODO 这里怎么回事
-//                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     // 安全上下文中设置登录用户凭证
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    LOGGER.debug("authentication, {}", authentication);
                 }
             }
         }

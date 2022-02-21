@@ -7,6 +7,7 @@ import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
 import com.github.pagehelper.PageInfo;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,11 +40,6 @@ public interface UmsAdminService {
      */
     PageInfo<UmsAdminDO> list(String keyword, Integer pageSize, Integer pageNum);
 
-    /**
-     * 修改指定用户信息
-     */
-    @Transactional
-    boolean update(Long id, UmsAdminDO admin);
 
     /**
      * 删除指定用户
@@ -100,5 +96,12 @@ public interface UmsAdminService {
      * @param adminLoginParam
      */
     String login(UmsAdminLoginParam adminLoginParam);
+
+    /**
+     * 根据用户名查询用户基础信息与拥有权限并封装为UserDetails
+     * @param username
+     * @return
+     */
+    public UserDetails loadUserByUsername(String username);
 
 }

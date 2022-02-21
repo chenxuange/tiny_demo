@@ -2,6 +2,7 @@ package com.example.tiny_demo.modules.ums.service.impl;
 
 import com.example.tiny_demo.common.api.ResultCode;
 import com.example.tiny_demo.common.exception.Asserts;
+import com.example.tiny_demo.domain.LoginUserDetails;
 import com.example.tiny_demo.modules.ums.dto.UmsAdminLoginParam;
 import com.example.tiny_demo.modules.ums.dto.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
@@ -21,7 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -51,12 +57,15 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     @Autowired
     private UmsAdminRoleRMapper adminRoleRMapper;
 
+//    @Autowired
+//    private UserDetailsService userDetailsService;
+
     @Override
     public UmsAdminDO getAdminByUsername(String username) {
         UmsAdminDO query = new UmsAdminDO();
         query.setUsername(username);
         List<UmsAdminDO> list = adminMapper.selectList(query);
-        if(CollectionUtils.isEmpty(list)) {
+        if (CollectionUtils.isEmpty(list)) {
             return null;
         }
         return list.get(0);
@@ -85,7 +94,8 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public String refreshToken(String oldToken) {
-        return null;
+        logger.debug("UmsAdminServiceImpl.refreshToken, oldToken = {}", oldToken);
+        return jwtTokenUtil.refreshHeadToken(oldToken);
     }
 
     @Override
@@ -93,11 +103,6 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         PageInfo<UmsAdminDO> pageInfo = PageHelper.startPage(pageNum, pageSize)
                 .doSelectPageInfo(() -> adminMapper.selectByKeyword(keyword));
         return pageInfo;
-    }
-
-    @Override
-    public boolean update(Long id, UmsAdminDO admin) {
-        return false;
     }
 
     @Override
@@ -110,7 +115,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             Asserts.fail("该用户不存在");
         }
         // 不要一开始就把所有状况想清楚
-         adminMapper.deleteByIdBatch(ids);
+        adminMapper.deleteByIdBatch(ids);
     }
 
     @Override
@@ -172,7 +177,6 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public UmsAdminDO updateUser(Integer id, UmsAdminParam adminParam) {
-        // TODO 先查再更新
         ArrayList<Integer> ids = new ArrayList<>();
         ids.add(id);
         List<UmsAdminDO> list = adminMapper.selectByIdBatch(ids);
@@ -190,30 +194,32 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     public String login(UmsAdminLoginParam adminLoginParam) {
         String token = null;
         try {
-            // TODO 实际上，应该由loadUserByUsername去判断
-            UmsAdminDO condition = new UmsAdminDO();
-            condition.setUsername(adminLoginParam.getUsername());
-            List<UmsAdminDO> list = adminMapper.selectList(condition);
-            if (CollectionUtils.isEmpty(list)) {
-                Asserts.fail("该用户不存在");
-            }
-            if (!passwordEncoder.matches(adminLoginParam.getPassword(), list.get(0).getPassword())) {
+            // 核心：通过前端传递的用户名去查找是否存在真实账户,并返回自定义UserDetails
+            UserDetails userDetails = loadUserByUsername(adminLoginParam.getUsername());
+            if (!passwordEncoder.matches(adminLoginParam.getPassword(), userDetails.getPassword())) {
                 Asserts.fail("密码错误");
             }
-            if (list.get(0).getStatus() == 0) {
+            if (!userDetails.isEnabled()) {
                 Asserts.fail("该账户已被禁用");
             }
-            Map<String, Object> claims = new HashMap<>();
-            // TODO 临时，为了早下班
-            String CLAIM_KEY_USERNAME = "sub";
-            String CLAIM_KEY_CREATED = "created";
-            claims.put(CLAIM_KEY_USERNAME, list.get(0).getUsername());
-            claims.put(CLAIM_KEY_CREATED, new Date());
+            // 登录时设置一个凭证
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             // 生成token
-            token = jwtTokenUtil.generateToken(claims);
+            token = jwtTokenUtil.generateToken(userDetails);
         } catch (AuthenticationException e) {
-            logger.warn("登录异常，{}", e.getMessage());
+            logger.warn("UmsAdminServiceImpl.login, 登录异常，{}", e.getMessage());
         }
         return token;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        UmsAdminDO admin = this.getAdminByUsername(username);
+        if (admin == null) {
+            throw new UsernameNotFoundException("用户名或密码错误");
+        }
+        List<UmsResourceDo> resourceList = this.getResourceList(admin.getId());
+        return new LoginUserDetails(admin, resourceList);
     }
 }

@@ -9,6 +9,7 @@ import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
+import com.example.tiny_demo.modules.ums.service.UmsRoleService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,8 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Api(tags = "UmsAdminController", description = "后台用户管理")
 @RestController
@@ -44,21 +48,20 @@ public class UmsAdminController {
     @Autowired
     private UmsAdminService adminService;
 
+    @Autowired
+    private UmsRoleService roleService;
+
+    @Value("${jwt.tokenHeader}")
+    private String tokenHeader;
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
 
-    @PreAuthorize("hasAuthority('1:商品品牌管理1')")
+    @PreAuthorize("hasAuthority('1:商品品牌管理')")
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
     public CommonResult userInfo(@PathVariable Integer id) {
         UmsAdminDO umsAdminDO = adminService.get(id);
-
-//        // TODO 模拟一个极简用户登录, 待安全功能完备
-//        UserDetails userDetails = new User("tom", "", Collections.singleton(() -> null));
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null);
-//        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
         return CommonResult.success(umsAdminDO);
     }
 
@@ -81,14 +84,25 @@ public class UmsAdminController {
     @ApiOperation(value = "获取当前登陆用户信息")
     @GetMapping("/info")
     public CommonResult info(HttpServletRequest request) {
-        // TODO 待安全功能完备
+        // TODO 这里实际是无效的，因为每一次先通过jwt过滤器，authentication即便为空也会重新赋值
+        logger.debug("authentication, {}", SecurityContextHolder.getContext().getAuthentication());
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
-            System.out.println("Principal is null");
-            return CommonResult.fail(null);
+            return CommonResult.fail(ResultCode.UNAUTHENTICATED);
         }
         String name = principal.getName();
-        return CommonResult.success(name);
+        UmsAdminDO umsAdmin = adminService.getAdminByUsername(name);
+        logger.debug("umsAdmin, {}", umsAdmin);
+        Map<String, Object> data = new HashMap<>();
+        data.put("username", umsAdmin.getUsername());
+        data.put("menus", roleService.getMenuList(umsAdmin.getId()));
+        data.put("icon", umsAdmin.getIcon());
+        List<UmsRoleDo> roleList = adminService.getRoleList(umsAdmin.getId());
+        if(!CollectionUtils.isEmpty(roleList)){
+            List<String> roles = roleList.stream().map(UmsRoleDo::getName).collect(Collectors.toList());
+            data.put("roles",roles);
+        }
+        return CommonResult.success(data);
     }
 
     @ApiOperation(value = "根据用户名或姓名以及分页参数获取用户列表")
@@ -118,14 +132,23 @@ public class UmsAdminController {
     @PostMapping("/logout")
     public CommonResult logout() {
         // 注销当前用户
+        // TODO 测试发现，安全上下文中清空认证没有意义,因为每次新请求，这个莫名就清空了
+        SecurityContextHolder.getContext().setAuthentication(null);
         return CommonResult.success("logout");
     }
 
     @ApiOperation("刷新token")
     @GetMapping("/refreshToken")
-    public CommonResult refresh() {
-        // TODO 待安全功能完备
-        return CommonResult.success("refresh");
+    public CommonResult refresh(HttpServletRequest request) {
+        String oldToken = request.getHeader(tokenHeader);
+        String token = adminService.refreshToken(oldToken);
+        if (token == null) {
+            return CommonResult.fail("token已过期");
+        }
+        HashMap<String, String> map = new HashMap<>();
+        map.put(tokenHead, "Bearer "); // 注意Bearer 后有个空格
+        map.put("token", token);
+        return CommonResult.success(map);
     }
 
     @ApiOperation(value = "用户注册")

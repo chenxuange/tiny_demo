@@ -68,7 +68,7 @@ public class UmsRoleServiceImpl implements UmsRoleService {
 
     @Override
     public UmsRoleDo create(UmsRoleParam roleParam) {
-        // TODO 实际角色表中应该给name加唯一约束
+        // 实际数据库中角色表中应该给name加唯一约束
         UmsRoleDo query = new UmsRoleDo();
         query.setName(roleParam.getName());
         List<UmsRoleDo> list = roleMapper.selectList(query);
@@ -120,12 +120,12 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         // 先判断角色id是否存在，再判断菜单id是否存在
         List<UmsRoleDo> roleDoList = roleMapper.selectById(roleId);
         if(CollectionUtils.isEmpty(roleDoList)) {
-            Asserts.fail("关联角色不存在");
+            Asserts.fail("传入的角色id有误");
         }
-        // TODO 这步存在问题，应该每个建立关系的资源狗应该存在
         List<UmsMenuDo> menuDoList = menuMapper.selectByIdBatch(menuIds);
         if(CollectionUtils.isEmpty(menuDoList) && menuDoList.size() == menuIds.size()) {
-            Asserts.fail("关联菜单有不存在");
+            // 本地执行严格匹配策略，即传入的菜单id必须库中存在，有一个对应不上就提示错误
+            Asserts.fail("传入的菜单id列表中有误");
         }
         // 删除指定角色下的菜单关系
         roleMenuRMapper.deleteByRoleId(roleId);
@@ -144,12 +144,12 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         // 先判断角色id是否存在，再判断资源id是否存在
         List<UmsRoleDo> roleDoList = roleMapper.selectById(roleId);
         if(CollectionUtils.isEmpty(roleDoList)) {
-            Asserts.fail("关联角色不存在");
+            Asserts.fail("传入的角色id有误");
         }
-        // TODO 这步存在问题，应该每个建立关系的资源狗应该存在
         List<UmsResourceDo> resourceDoList = resourceMapper.selectByIdBatch(resourceIds);
         if(CollectionUtils.isEmpty(resourceDoList) && resourceDoList.size() == resourceIds.size()) {
-            Asserts.fail("关联资源有不存在");
+            // 严格保证，每个资源id都存在
+            Asserts.fail("传入的资源id列表中有误");
         }
         // 建立新的关系前，应该删除旧的关系
         roleResourceRMapper.deleteByRoleId(roleId);
@@ -161,5 +161,10 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         }).collect(Collectors.toList());
         roleResourceRMapper.insertBatch(list);
         return list;
+    }
+
+    @Override
+    public List<UmsMenuDo> getMenuList(Integer adminId) {
+        return menuMapper.getMenuList(adminId);
     }
 }

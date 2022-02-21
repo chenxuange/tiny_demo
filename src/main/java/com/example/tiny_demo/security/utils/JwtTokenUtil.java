@@ -26,10 +26,9 @@ import java.util.Map;
  * HMACSHA512(base64UrlEncode(header) + "." +base64UrlEncode(payload),secret)
  * Created by macro on 2018/4/26.
  */
-// TODO 后续交给SecurityConfig统一生成bean
 @Component
 public class JwtTokenUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
     private static final String CLAIM_KEY_USERNAME = "sub";
     private static final String CLAIM_KEY_CREATED = "created";
     @Value("${jwt.secret}")
@@ -65,7 +64,7 @@ public class JwtTokenUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
-            LOGGER.info("JWT格式验证失败:{}", token);
+            logger.info("JWT格式验证失败:{}", token);
         }
         return claims;
     }
@@ -137,6 +136,7 @@ public class JwtTokenUtil {
         if(StringUtils.isEmpty(oldToken)){
             return null;
         }
+        // 截取
         String token = oldToken.substring(tokenHead.length());
         if(StringUtils.isEmpty(token)){
             return null;
@@ -144,17 +144,21 @@ public class JwtTokenUtil {
         //token校验不通过
         Claims claims = getClaimsFromToken(token);
         if(claims==null){
+            logger.debug("JwtTokenUtil.refreshHeadToken, {}", "token校验不通过");
             return null;
         }
         //如果token已经过期，不支持刷新
         if(isTokenExpired(token)){
+            logger.debug("JwtTokenUtil.refreshHeadToken, {}", "token已经过期，不支持刷新");
             return null;
         }
         //如果token在30分钟之内刚刷新过，返回原token
         if(tokenRefreshJustBefore(token,30*60)){
+            logger.debug("JwtTokenUtil.refreshHeadToken, {}", "token在30分钟之内刚刷新过，返回原token");
             return token;
         }else{
             claims.put(CLAIM_KEY_CREATED, new Date());
+            logger.debug("JwtTokenUtil.refreshHeadToken, {}", "token再次刷新");
             return generateToken(claims);
         }
     }
@@ -168,11 +172,13 @@ public class JwtTokenUtil {
         Claims claims = getClaimsFromToken(token);
         Date created = claims.get(CLAIM_KEY_CREATED, Date.class);
         Date refreshDate = new Date();
-        //刷新时间在创建时间的指定时间内
-        // TODO 后续替代DateUtil
-//        if(refreshDate.after(created)&&refreshDate.before(DateUtil.offsetSecond(created,time))){
-//            return true;
-//        }
+        //刷新时间refreshDates是否在创建时间往后延迟指定时间范围内
+        Date offDate = new Date(created.getTime() + time * 1000L);
+        // 替代DateUtil DateUtil.offsetSecond(created,time)
+        if(refreshDate.after(created) && refreshDate.before(offDate)){
+            logger.debug("JwtTokenUtil.tokenRefreshJustBefore, {}", "token在指定时段内");
+            return true;
+        }
         return false;
     }
 }

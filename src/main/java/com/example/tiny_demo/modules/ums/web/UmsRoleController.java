@@ -5,9 +5,12 @@ import com.example.tiny_demo.common.api.CommonResult;
 import com.example.tiny_demo.modules.ums.dto.UmsRoleParam;
 import com.example.tiny_demo.modules.ums.model.*;
 import com.example.tiny_demo.modules.ums.service.UmsRoleService;
+import com.example.tiny_demo.modules.ums.service.impl.UmsAdminServiceImpl;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,7 @@ import java.util.List;
 @RequestMapping("/role")
 public class UmsRoleController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UmsRoleController.class);
 
     @Autowired
     private UmsRoleService roleService;
@@ -26,6 +30,7 @@ public class UmsRoleController {
     @GetMapping("/listAll")
     public CommonResult<List<UmsRoleDo>> listAll() {
         List<UmsRoleDo> list = roleService.listAll();
+        logger.debug("UmsRoleController.listAll, {}", "");
         return CommonResult.success(list);
     }
 
@@ -55,7 +60,7 @@ public class UmsRoleController {
     @ApiOperation("添加角色")
     @PostMapping("/create")
     public CommonResult<Object> create(@RequestBody UmsRoleParam roleParam) {
-        // TODO 实际不需要考虑这么多，比如增删改都应该是由具有特殊权限的人来操作，那么简单起见可以给最大权限
+        //  实际不需要考虑这么多，比如增删改有专门的权限控制框架控制，业务逻辑只需要考虑执行功能
         UmsRoleDo roleDo = roleService.create(roleParam);
         return CommonResult.success(roleDo);
 

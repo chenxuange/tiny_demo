@@ -43,4 +43,7 @@ public interface UmsMenuMapper {
      * @param roleId
      */
     List<UmsMenuDo> getMenuListByRoleId(Integer roleId);
+
+
+    List<UmsMenuDo> getMenuList(Integer adminId);
 }
