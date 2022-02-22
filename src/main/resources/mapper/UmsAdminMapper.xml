@@ -20,7 +20,7 @@
             (username, password, icon, email, nick_name, note, create_time, status)
         VALUES (#{username}, #{password}, #{icon}, #{email}, #{nickName}, #{note}, #{createTime}, #{status})
     </insert>
-    <update id="updateById">
+    <update id="updateByIdOrUsername">
         update ums_admin
         <set>
             <if test="username != null">
@@ -41,11 +41,21 @@
             <if test="note != null">
                 note = #{note},
             </if>
+            <if test="loginTime != null">
+                login_time = #{loginTime},
+            </if>
             <if test="status != null">
                 status = #{status},
             </if>
         </set>
-        where id = #{id}
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="username != null">
+                and username = #{username}
+            </if>
+        </where>
     </update>
     <delete id="deleteByIdBatch" parameterType="list">
         DELETE FROM ums_admin

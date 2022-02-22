@@ -4,7 +4,6 @@ import com.example.tiny_demo.modules.ums.mapper.UmsAdminRoleRMapper;
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper;
 import com.example.tiny_demo.modules.ums.model.UmsAdminRoleR;
-import com.example.tiny_demo.modules.ums.query.UmsAdminQuery;
 import com.example.tiny_demo.security.utils.JwtTokenUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +91,7 @@ public class UmsAdminMapperTest {
         UmsAdminDO umsAdminDO = new UmsAdminDO();
         umsAdminDO.setId(20);
         umsAdminDO.setUsername("jerry");
-        int c = mapper.updateById(umsAdminDO);
+        int c = mapper.updateByIdOrUsername(umsAdminDO);
         System.out.println(c);
     }
 

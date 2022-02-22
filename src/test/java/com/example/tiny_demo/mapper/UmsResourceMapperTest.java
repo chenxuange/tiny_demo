@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @SpringBootTest
-@Transactional
 public class UmsResourceMapperTest {
 
     @Autowired
@@ -41,5 +40,11 @@ public class UmsResourceMapperTest {
     public void selectByIdTest() {
         List<UmsResourceDo> umsResourceDos = mapper.selectById(19);
         System.out.println(umsResourceDos);
+    }
+
+    @Test
+    public void getResourceListTest() {
+        List<UmsResourceDo> resourceList = mapper.getResourceList(22);
+        System.out.println(resourceList.size());
     }
 }

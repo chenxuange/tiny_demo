@@ -42,9 +42,9 @@ public interface UmsAdminMapper {
     int deleteByIdBatch(ArrayList<Integer> ids);
 
     /**
-     * 根据用户id更新用户
+     * 根据用户id或用户名来更新用户
      * @param adminDO
      * @return
      */
-    int updateById(UmsAdminDO adminDO);
+    int updateByIdOrUsername(UmsAdminDO adminDO);
 }

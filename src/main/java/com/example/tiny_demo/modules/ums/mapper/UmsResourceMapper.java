@@ -51,6 +51,7 @@ public interface UmsResourceMapper {
 
     /**
      * 根据用户id获取所有关联资源
+     * 当用户角色关系表中没找到用户id时，表示该用户还没有角色，自然也就没有资源列表了
      * @param adminId
      */
     List<UmsResourceDo> getResourceList(Integer adminId);

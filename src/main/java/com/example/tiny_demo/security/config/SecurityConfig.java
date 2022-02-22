@@ -55,11 +55,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 //        super.configure(http);  // 关闭默认安全配置
-//        http.csrf().disable(); // 关闭跨域请求认证
+//        http.csrf().disable(); // security默认拦截器会开启csrf处理，jwt需关闭跨域请求认证
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
-        // 允许访问不需要保护的资源路径，如swagger，否则swagger接口文档打不开
+        // 允许访问不需要保护的资源路径，如swagger或登录相关等，否则swagger接口文档打不开
         for(String url : ignoreUrlsConfig.getUrls()) {
             registry.antMatchers(url).permitAll();
+            // 白名单路径访问后，authentication的principal是一个anonymousUser
         }
         // 任何授权请求需要身份认证
         registry.and()

@@ -45,7 +45,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             String authToken = authHeader.substring(tokenHead.length());
             // 从jwtToken中取出用户名
             String username = jwtTokenUtil.getUserNameFromToken(authToken);
-            LOGGER.info("checking username:{}", username);
+            LOGGER.info("checking username: {}", username);
             // TODO 这里先前设置的authentication无效，是什么原因
             if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 LOGGER.debug("authentication, {}", (Object) null);
@@ -53,7 +53,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 UserDetails userDetails = adminService.loadUserByUsername(username);
                 if(jwtTokenUtil.validateToken(authToken, userDetails)) {
                     String token = jwtTokenUtil.generateToken(userDetails);
-                    LOGGER.info("authenticated user:{}", username);
+                    LOGGER.info("authenticated user: {}", username);
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     // TODO 这里怎么回事
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -23,9 +23,9 @@ jwt:
 
 logging:
   level:
-#    com.example.tiny_demo: debug
-    com.example.tiny_demo.modules.ums: debug
-    com.example.tiny_demo.security: debug
+    com.example.tiny_demo: debug
+#    com.example.tiny_demo.modules.ums: debug
+#    com.example.tiny_demo.security: debug
 
 secure:
   ignored:

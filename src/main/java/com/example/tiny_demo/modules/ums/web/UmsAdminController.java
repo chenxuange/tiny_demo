@@ -33,10 +33,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Api(tags = "UmsAdminController", description = "后台用户管理")
@@ -57,7 +54,7 @@ public class UmsAdminController {
     private String tokenHead;
 
 
-    @PreAuthorize("hasAuthority('1:商品品牌管理')")
+    @PreAuthorize("hasAuthority('25:后台用户管理')")
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
     public CommonResult userInfo(@PathVariable Integer id) {
@@ -88,8 +85,9 @@ public class UmsAdminController {
         logger.debug("authentication, {}", SecurityContextHolder.getContext().getAuthentication());
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
-            return CommonResult.fail(ResultCode.UNAUTHENTICATED);
+            return CommonResult.fail(ResultCode.UNAUTHENTICATED, null);
         }
+        // 用户已经登录了
         String name = principal.getName();
         UmsAdminDO umsAdmin = adminService.getAdminByUsername(name);
         logger.debug("umsAdmin, {}", umsAdmin);
@@ -101,6 +99,8 @@ public class UmsAdminController {
         if(!CollectionUtils.isEmpty(roleList)){
             List<String> roles = roleList.stream().map(UmsRoleDo::getName).collect(Collectors.toList());
             data.put("roles",roles);
+        }else{
+            data.put("roles",new ArrayList<>());
         }
         return CommonResult.success(data);
     }

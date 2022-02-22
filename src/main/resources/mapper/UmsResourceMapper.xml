@@ -83,8 +83,8 @@
     <select id="getResourceList" resultType="com.example.tiny_demo.modules.ums.model.UmsResourceDo">
         select r.* from
             ums_admin a
-                LEFT JOIN ums_admin_role_relation ar on a.id = ar.admin_id
-                left join ums_role_resource_relation rr on rr.role_id = ar.role_id
+                right JOIN ums_admin_role_relation ar on a.id = ar.admin_id
+                right join ums_role_resource_relation rr on rr.role_id = ar.role_id
                 left join ums_resource r on rr.resource_id = r.id
         where a.id = #{adminId}
     </select>

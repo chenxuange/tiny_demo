@@ -6,14 +6,8 @@ import com.example.tiny_demo.domain.LoginUserDetails;
 import com.example.tiny_demo.modules.ums.dto.UmsAdminLoginParam;
 import com.example.tiny_demo.modules.ums.dto.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
-import com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper;
-import com.example.tiny_demo.modules.ums.mapper.UmsAdminRoleRMapper;
-import com.example.tiny_demo.modules.ums.mapper.UmsResourceMapper;
-import com.example.tiny_demo.modules.ums.mapper.UmsRoleMapper;
-import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
-import com.example.tiny_demo.modules.ums.model.UmsAdminRoleR;
-import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
-import com.example.tiny_demo.modules.ums.model.UmsRoleDo;
+import com.example.tiny_demo.modules.ums.mapper.*;
+import com.example.tiny_demo.modules.ums.model.*;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.example.tiny_demo.security.utils.JwtTokenUtil;
 import com.github.pagehelper.PageHelper;
@@ -26,12 +20,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,8 +52,11 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     @Autowired
     private UmsAdminRoleRMapper adminRoleRMapper;
 
-//    @Autowired
-//    private UserDetailsService userDetailsService;
+    @Autowired
+    private UmsAdminLoginLogMapper logMapper;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     @Override
     public UmsAdminDO getAdminByUsername(String username) {
@@ -81,7 +79,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             // 已经存在用户
             Asserts.fail(ResultCode.ADMIN_EXIST_ERROR);
         }
-        // 新用户注册时间
+        // 新用户注册时间, 登录时间这时不设置
         umsAdminDO.setCreateTime(new Date());
         // 新增用户默认启用
         umsAdminDO.setStatus(1);
@@ -161,7 +159,8 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         }
         // 更新密码
         umsAdminDO.setPassword(passwordEncoder.encode(updatePasswordParam.getNewPassword()));
-        adminMapper.updateById(umsAdminDO);
+        adminMapper.updateByIdOrUsername(umsAdminDO);
+        // TODO 1. 更改密码时：当用户更改密码时，请注意用户数据库中的更改密码时间，因此当更改密码时间大于令牌创建时间时，令牌无效
     }
 
     @Override
@@ -186,7 +185,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         UmsAdminDO adminDO = new UmsAdminDO();
         BeanUtils.copyProperties(adminParam, adminDO);
         adminDO.setId(id);
-        adminMapper.updateById(adminDO);
+        adminMapper.updateByIdOrUsername(adminDO);
         return adminDO;
     }
 
@@ -207,10 +206,53 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             // 生成token
             token = jwtTokenUtil.generateToken(userDetails);
+            // TODO 插入登录日志，修改用户最后一次登录时间
+            updateLastLoginTime(userDetails.getUsername());
+            insertLoginLog(userDetails.getUsername());
         } catch (AuthenticationException e) {
             logger.warn("UmsAdminServiceImpl.login, 登录异常，{}", e.getMessage());
         }
         return token;
+    }
+
+    /**
+     * 更新最后一次登录时间
+     * @param username
+     */
+    private void updateLastLoginTime(String username) {
+        try{
+            UmsAdminDO adminDO = new UmsAdminDO();
+            adminDO.setUsername(username);
+            adminDO.setLoginTime(new Date());
+            adminMapper.updateByIdOrUsername(adminDO);
+        }catch (Exception e) {
+            logger.warn("updateLastLoginTime fail, {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 插入用户 username 的登录日志
+     * @param username
+     */
+    private void insertLoginLog(String username) {
+        try {
+            UmsAdminDO query = new UmsAdminDO();
+            query.setUsername(username);
+            List<UmsAdminDO> list = adminMapper.selectList(query);
+            // 此时list肯定不为空，无需判断
+            UmsAdminLoginLog loginLog = new UmsAdminLoginLog();
+            loginLog.setAdminId(list.get(0).getId());
+            loginLog.setCreateTime(new Date());
+//        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//        HttpServletRequest request = requestAttributes.getRequest();
+//        String remoteAddr = request.getRemoteAddr();
+//        logger.debug("remoteAddr, {}", remoteAddr);
+            String addr = httpServletRequest.getRemoteAddr();
+            loginLog.setIp(addr);
+            logMapper.insert(loginLog);
+        } catch (Exception e) {
+            logger.warn("insertLoginLog fail, {}", e.getMessage());
+        }
     }
 
     @Override

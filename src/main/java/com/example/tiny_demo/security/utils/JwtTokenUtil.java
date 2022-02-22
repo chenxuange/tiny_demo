@@ -70,7 +70,8 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 生成token的过期时间
+     * 生成token的过期时间,expiration单位秒
+     *
      */
     private Date generateExpirationDate() {
         return new Date(System.currentTimeMillis() + expiration * 1000);
@@ -91,7 +92,7 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 验证token是否还有效
+     * 验证token是否有效, 必须用户名相同且token未过期
      *
      * @param token       客户端传入的token
      * @param userDetails 从数据库中查询出来的用户信息
@@ -102,7 +103,7 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 判断token是否已经失效
+     * 判断token是否过期, 若token中的过期时间在此刻之前，说明过期
      */
     private boolean isTokenExpired(String token) {
         Date expiredDate = getExpiredDateFromToken(token);
@@ -118,7 +119,8 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 根据用户信息生成token
+     * 根据用户信息UserDetails生成token,
+     * 实际只需UserDetails中的用户名
      */
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
@@ -129,7 +131,6 @@ public class JwtTokenUtil {
 
     /**
      * 当原来的token没过期时是可以刷新的
-     *
      * @param oldToken 带tokenHead的token
      */
     public String refreshHeadToken(String oldToken) {
@@ -164,16 +165,16 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 判断token在指定时间内是否刚刚刷新过
+     * 判断token在指定时段内是否刷新过
      * @param token 原token
-     * @param time 指定时间（秒）
+     * @param delayTime 指定时间（秒）
      */
-    private boolean tokenRefreshJustBefore(String token, int time) {
+    private boolean tokenRefreshJustBefore(String token, int delayTime) {
         Claims claims = getClaimsFromToken(token);
         Date created = claims.get(CLAIM_KEY_CREATED, Date.class);
         Date refreshDate = new Date();
         //刷新时间refreshDates是否在创建时间往后延迟指定时间范围内
-        Date offDate = new Date(created.getTime() + time * 1000L);
+        Date offDate = new Date(created.getTime() + delayTime * 1000L);
         // 替代DateUtil DateUtil.offsetSecond(created,time)
         if(refreshDate.after(created) && refreshDate.before(offDate)){
             logger.debug("JwtTokenUtil.tokenRefreshJustBefore, {}", "token在指定时段内");
