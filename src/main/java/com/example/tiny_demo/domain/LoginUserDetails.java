@@ -34,7 +34,6 @@ public class LoginUserDetails implements UserDetails {
     // 取出所有权限
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        logger.debug("LoginUserDetails.resourceList, {}", resourceList);
         List<SimpleGrantedAuthority> authorities = resourceList.stream()
                     .map(role -> new SimpleGrantedAuthority(role.getId() + ":" + role.getName())).collect(Collectors.toList());
             // TODO 若控制器方法上添加@PreAuthorize("hasRole('test')")用作权限控制，那么数据库中必须对应ROLE_test，实际控制器@PreAuthorize("hasRole('ROLE_test')")也可以
@@ -46,7 +45,7 @@ public class LoginUserDetails implements UserDetails {
              * 2. 根据 SecurityExpressionRoot 中 hasAuthority,实际上 defaultRolePrefix 设置为 null ,就不需要考虑前缀了
              */
 //            authorities.add(new SimpleGrantedAuthority("ROLE_test"));  // TODO 为了测试
-        logger.debug("LoginUserDetails.getAuthorities, {}", authorities);
+        logger.debug("authorities, {}", authorities);
         return authorities;
     }
 

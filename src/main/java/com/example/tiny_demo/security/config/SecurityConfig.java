@@ -2,9 +2,10 @@ package com.example.tiny_demo.security.config;
 
 
 import com.example.tiny_demo.common.api.CommonResult;
-import com.example.tiny_demo.security.component.JwtAuthenticationTokenFilter;
+import com.example.tiny_demo.security.component.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,7 +18,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.PortResolverImpl;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import springfox.documentation.spring.web.json.JsonSerializer;
 
@@ -31,8 +34,8 @@ import java.io.IOException;
  */
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+//    @Autowired
+//    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     @Autowired
     private AccessDeniedHandler restfulAccessDeniedHandler;
@@ -42,6 +45,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private IgnoreUrlsConfig ignoreUrlsConfig;
+
+    @Autowired(required = false)
+    private DynamicSecurityService securityService;
+
+    @Autowired(required = false)
+    private DynamicSecurityFilter securityFilter;
+
+//    // 三个有条件的生成bean
+//    @ConditionalOnBean(DynamicSecurityService.class)
+//    @Bean
+//    public DynamicSecurityMetadataSource dynamicSecurityMetadataSource() {
+//        return new DynamicSecurityMetadataSource();
+//    }
+//
+//    @ConditionalOnBean(DynamicSecurityService.class)
+//    @Bean
+//    public DynamicAccessDecisionManager dynamicAccessDecisionManager() {
+//        return new DynamicAccessDecisionManager();
+//    }
+//
+    @ConditionalOnBean(DynamicSecurityService.class)
+    @Bean
+    public DynamicSecurityFilter dynamicSecurityFilter() {
+        return new DynamicSecurityFilter();
+    }
 
 
     /**
@@ -80,8 +108,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 // 自定义权限拦截器JWT过滤器,完成认证
                 .and()
-                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        System.out.println("securityService, "+ securityService.getClass().getName());
+        System.out.println("securityFilter, "+ securityFilter);
+        if(securityService != null) {
+            // 自定义权限过滤拦截器，完成鉴权
+//            registry.and().addFilterBefore(dynamicSecurityFilter(), FilterSecurityInterceptor.class);
+        }
     }
 
     @Bean
@@ -133,5 +166,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        // 内存中设置用户配合默认的安全配置，从而进入登录页面
 //        auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder().encode("123")).roles("admin");
 //    }
+
+    public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
+        return new JwtAuthenticationTokenFilter();
+    }
 }
 

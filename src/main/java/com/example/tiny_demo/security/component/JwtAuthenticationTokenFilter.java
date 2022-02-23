@@ -28,17 +28,13 @@ import java.util.List;
 /**
  * 登录认证过滤器
  */
-@Configuration
+//@Configuration
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
 
-    // TODO 待删
     @Autowired
-    private UmsAdminMapper adminMapper;
-
-    @Autowired
-    private UmsAdminService adminService;
+    private UserDetailsService userDetailsService;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     @Value("${jwt.tokenHeader}")
@@ -57,18 +53,18 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             LOGGER.info("checking username: {}", username);
             // TODO 这里先前设置的authentication无效，是什么原因
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                LOGGER.debug("authentication, {}", (Object) null);
+//                LOGGER.debug("authentication, {}", (Object) null);
                 // 根据用户名查询并封装
-                UserDetails userDetails = adminService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 // TODO 待删，测试token ------------------------------------
-                UmsAdminDO umsAdminDO = new UmsAdminDO();
-                umsAdminDO.setUsername(userDetails.getUsername());
-                List<UmsAdminDO> list = adminMapper.selectList(umsAdminDO);
-                Date operatorTime = list.get(0).getOperatorTime();
-                Date createTimeFromToken = jwtTokenUtil.getCreateTimeFromToken(authToken);
-                LOGGER.debug("operatorTime, {}", operatorTime);
-                LOGGER.debug("createTimeFromToken, {}", createTimeFromToken);
+//                UmsAdminDO umsAdminDO = new UmsAdminDO();
+//                umsAdminDO.setUsername(userDetails.getUsername());
+//                List<UmsAdminDO> list = adminMapper.selectList(umsAdminDO);
+//                Date operatorTime = list.get(0).getOperatorTime();
+//                Date createTimeFromToken = jwtTokenUtil.getCreateTimeFromToken(authToken);
+//                LOGGER.debug("operatorTime, {}", operatorTime);
+//                LOGGER.debug("createTimeFromToken, {}", createTimeFromToken);
                 // ------------------------------------
 
                 // 前一个判断是比较用户名和过期时间，后一个判断是是否需将token强制失效
@@ -81,7 +77,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     // 安全上下文中设置登录用户凭证
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    LOGGER.debug("authentication, {}", authentication);
+//                    LOGGER.debug("authentication, {}", authentication);
                 }
             }
         }
