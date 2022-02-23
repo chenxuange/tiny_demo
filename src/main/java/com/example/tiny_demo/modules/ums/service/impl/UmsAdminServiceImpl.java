@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,7 +92,13 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     @Override
     public String refreshToken(String oldToken) {
         logger.debug("UmsAdminServiceImpl.refreshToken, oldToken = {}", oldToken);
-        return jwtTokenUtil.refreshHeadToken(oldToken);
+        String username = jwtTokenUtil.getUserNameFromToken(oldToken);
+        // 半小时内，新旧token是相同的
+        String newToken = jwtTokenUtil.refreshHeadToken(oldToken);
+        if(!oldToken.equals(newToken))
+            // 若新token和原token不同，更新操作时间
+            updateOperatorTime(null, username, jwtTokenUtil.getCreateTimeFromToken(newToken));
+        return newToken;
     }
 
     @Override
@@ -161,6 +166,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         umsAdminDO.setPassword(passwordEncoder.encode(updatePasswordParam.getNewPassword()));
         adminMapper.updateByIdOrUsername(umsAdminDO);
         // TODO 1. 更改密码时：当用户更改密码时，请注意用户数据库中的更改密码时间，因此当更改密码时间大于令牌创建时间时，令牌无效
+        updateOperatorTime(null, updatePasswordParam.getUsername(), null);
     }
 
     @Override
@@ -204,11 +210,11 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             // 登录时设置一个凭证
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            // 生成token
-            token = jwtTokenUtil.generateToken(userDetails);
-            // TODO 插入登录日志，修改用户最后一次登录时间
+            //  插入登录日志，修改用户最后一次登录时间
             updateLastLoginTime(userDetails.getUsername());
             insertLoginLog(userDetails.getUsername());
+            // 生成全新的token
+            token = jwtTokenUtil.generateToken(userDetails);
         } catch (AuthenticationException e) {
             logger.warn("UmsAdminServiceImpl.login, 登录异常，{}", e.getMessage());
         }
@@ -263,5 +269,40 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         }
         List<UmsResourceDo> resourceList = this.getResourceList(admin.getId());
         return new LoginUserDetails(admin, resourceList);
+    }
+
+    @Override
+    public void updateStatus(Integer id, Integer status) {
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(id);
+        List<UmsAdminDO> list = adminMapper.selectByIdBatch(ids);
+        if (CollectionUtils.isEmpty(list)) {
+            Asserts.fail("该用户不存在");
+        }
+        UmsAdminDO adminDO = new UmsAdminDO();
+        adminDO.setId(id);
+        adminDO.setStatus(status);
+        adminMapper.updateByIdOrUsername(adminDO);
+    }
+
+    @Override
+    public void logout(String name) {
+        updateOperatorTime(null, name, null);
+    }
+
+    /**
+     * 根据用户名或用户id更新用户操作时间
+     */
+    private void updateOperatorTime(Integer id, String username, Date setTime) {
+        UmsAdminDO adminDO = new UmsAdminDO();
+        adminDO.setId(id);
+        adminDO.setUsername(username);
+        if(setTime == null) {
+            adminDO.setOperatorTime(new Date());
+        }else{
+            // 数据库中datetime默认对毫秒数舍并进一位的，所以实际保存时间是当前时间多一秒. 将库中该字段改为datetime(3)保留三位精度解决了
+            adminDO.setOperatorTime(setTime);
+        }
+        adminMapper.updateByIdOrUsername(adminDO);
     }
 }

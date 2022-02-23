@@ -33,5 +33,7 @@ public class UmsAdminDO implements Serializable {
     private Date loginTime;
     @ApiModelProperty(value = "账户启用状态: 0->禁用; 1->启用")
     private Integer status;
+    @ApiModelProperty(value = "判断token失效的操作时间")
+    private Date operatorTime;
 }
 

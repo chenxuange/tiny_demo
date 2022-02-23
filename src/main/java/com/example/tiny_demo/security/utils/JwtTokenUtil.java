@@ -1,5 +1,6 @@
 package com.example.tiny_demo.security.utils;
 
+import com.example.tiny_demo.domain.LoginUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -38,6 +39,10 @@ public class JwtTokenUtil {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
 
+    /**
+     * 过期持续时间
+     * @return
+     */
     public Long getExpiration() {
         return expiration;
     }
@@ -92,6 +97,22 @@ public class JwtTokenUtil {
     }
 
     /**
+     * 从token中获取创建时间
+     * @param token
+     * @return
+     */
+    public Date getCreateTimeFromToken(String token) {
+        Date createTime;
+        try {
+            Claims claims = getClaimsFromToken(token);
+            createTime = claims.get(CLAIM_KEY_CREATED, Date.class);
+        } catch (Exception e) {
+            createTime = null;
+        }
+        return createTime;
+    }
+
+    /**
      * 验证token是否有效, 必须用户名相同且token未过期
      *
      * @param token       客户端传入的token
@@ -109,6 +130,22 @@ public class JwtTokenUtil {
         Date expiredDate = getExpiredDateFromToken(token);
         return expiredDate.before(new Date());
     }
+
+    /**
+     * 根据用户的操作时间判断是否将token强制失效
+     * @param token
+     * @param userDetails
+     * @return
+     */
+    public boolean forceInValid(String token, UserDetails userDetails) {
+        Date createTime = getCreateTimeFromToken(token);
+        LoginUserDetails loginUserDetails = (LoginUserDetails) userDetails;
+        Date operatorTime = loginUserDetails.getAdmin().getOperatorTime();
+        if(operatorTime != null && createTime.before(operatorTime))
+            return true;
+        return false;
+    }
+
 
     /**
      * 从token中获取过期时间
@@ -154,7 +191,7 @@ public class JwtTokenUtil {
             return null;
         }
         //如果token在30分钟之内刚刷新过，返回原token
-        if(tokenRefreshJustBefore(token,30*60)){
+        if(tokenRefreshJustBefore(token,60)){
             logger.debug("JwtTokenUtil.refreshHeadToken, {}", "token在30分钟之内刚刷新过，返回原token");
             return token;
         }else{

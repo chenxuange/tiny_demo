@@ -2,6 +2,7 @@ package com.example.tiny_demo.domain;
 
 import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -79,5 +80,13 @@ public class LoginUserDetails implements UserDetails {
     public boolean isEnabled() {
         // 账号可用
         return Objects.equals(1, admin.getStatus());
+    }
+
+    public UmsAdminDO getAdmin() {
+        return admin;
+    }
+
+    public List<UmsResourceDo> getResourceList() {
+        return resourceList;
     }
 }

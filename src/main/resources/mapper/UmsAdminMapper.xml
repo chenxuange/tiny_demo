@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsAdminMapper">
     <resultMap id="UmsAdminMap" type="com.example.tiny_demo.modules.ums.model.UmsAdminDO">
-
         <id column="id" property="id"/>
         <result column="username" property="username"/>
         <result column="password" property="password"/>
@@ -13,6 +12,7 @@
         <result column="create_time" property="createTime"/>
         <result column="login_time" property="loginTime"/>
         <result column="status" property="status"/>
+        <result column="operator_time" property="operatorTime"/>
     </resultMap>
 
     <insert id="insert">
@@ -47,6 +47,9 @@
             <if test="status != null">
                 status = #{status},
             </if>
+            <if test="operatorTime != null">
+                operator_time = #{operatorTime},
+            </if>
         </set>
         <where>
             <if test="id != null">
@@ -66,7 +69,7 @@
     </delete>
 
     <select id="selectList" resultMap="UmsAdminMap">
-        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status, operator_time
         from ums_admin
         where 1= 1
         <if test="umsAdmin.id != null">
@@ -101,7 +104,7 @@
         </if>
     </select>
     <select id="selectByIdBatch" resultMap="UmsAdminMap">
-        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status, operator_time
         from ums_admin
         where id in
         <foreach collection="list" item="id" open="(" close=")" separator=",">
@@ -109,7 +112,7 @@
         </foreach>
     </select>
     <select id="selectByKeyword" resultMap="UmsAdminMap">
-        select id, username, password, icon, email, nick_name, note, create_time, login_time, status
+        select id, username, password, icon, email, nick_name, note, create_time, login_time, status, operator_time
         from ums_admin
         <if test="keyword != null">
             where username like #{keyword} or nick_name like #{keyword}

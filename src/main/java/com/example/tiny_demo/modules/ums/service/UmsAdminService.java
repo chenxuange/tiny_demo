@@ -104,4 +104,18 @@ public interface UmsAdminService {
      */
     public UserDetails loadUserByUsername(String username);
 
+    /**
+     * 修改指定用户状态
+     * @param id
+     * @param status
+     */
+    @Transactional
+    void updateStatus(Integer id, Integer status);
+
+    /**
+     * 注销用户
+     * @param name
+     */
+    @Transactional
+    void logout(String name);
 }
