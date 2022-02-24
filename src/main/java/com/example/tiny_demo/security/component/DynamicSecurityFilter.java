@@ -1,11 +1,10 @@
 package com.example.tiny_demo.security.component;
 
+
 import com.example.tiny_demo.security.config.IgnoreUrlsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
@@ -20,12 +19,16 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
 
     public static final Logger logger = LoggerFactory.getLogger(DynamicSecurityFilter.class);
 
-    @Autowired(required = false)
-    private DynamicSecurityMetadataSource securityMetadataSource;
+    @Autowired
+    private DynamicSecurityMetadataSource dynamicSecurityMetadataSource;
 
     @Autowired
     private IgnoreUrlsConfig ignoreUrlsConfig;
 
+    @Autowired
+    public void setMyAccessDecisionManager(DynamicAccessDecisionManager dynamicAccessDecisionManager) {
+        super.setAccessDecisionManager(dynamicAccessDecisionManager);
+    }
 
     // 放行规则
     @Override
@@ -33,20 +36,30 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
         HttpServletRequest req = (HttpServletRequest) request;
         FilterInvocation fi = new FilterInvocation(request, response, chain);
         // TODO 后续options遇检放行
-        // 白名单内的直接放行
+        // 白名单内的直接放行, 不需要鉴权
         String requestURI = req.getRequestURI();
-        logger.debug("ignoreUrls, {}", ignoreUrlsConfig.getUrls());
         logger.debug("requestURI, {}", requestURI);
         AntPathMatcher pathMatcher = new AntPathMatcher();
         for (String ignoreUrl : ignoreUrlsConfig.getUrls())
             if (pathMatcher.match(ignoreUrl, requestURI)) {
+                logger.debug("ignoreUrl, {}", ignoreUrl);
                 fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
-                // TODO 上下有区别吗
-//            chain.doFilter(request, response);
+                //  上下没区别
+//                chain.doFilter(request, response);
                 return;
             }
         //核心：此处会调用AccessDecisionManager中的decide方法进行鉴权操作
         // 实际里面有 this.accessDecisionManager.decide(authenticated, object, attributes);
+        /**
+         * 核心就是下面三条，
+         * 1.先去拿到安全元数据来源并调用getAttributes获取安全配置
+         * 2.再去获取认证
+         * 3. 再去鉴权
+         * 		Collection<ConfigAttribute> attributes = this.obtainSecurityMetadataSource()
+         * 				.getAttributes(object);
+         * 		Authentication authenticated = authenticateIfRequired();
+         * 		this.accessDecisionManager.decide(authenticated, object, attributes);
+         */
         InterceptorStatusToken token = super.beforeInvocation(fi);
         try {
             fi.getChain().doFilter(fi.getRequest(), fi.getResponse());
@@ -56,7 +69,7 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
 
     }
 
-    // TODO 不清楚
+    // 必须返回安全对象，即自定义安全拦截器，否则 Error creating bean with name 'dynamicSecurityFilter'
     @Override
     public Class<?> getSecureObjectClass() {
         return FilterInvocation.class;
@@ -64,6 +77,6 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
 
     @Override
     public SecurityMetadataSource obtainSecurityMetadataSource() {
-        return securityMetadataSource;
+        return dynamicSecurityMetadataSource;
     }
 }

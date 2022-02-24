@@ -54,7 +54,7 @@ public class UmsAdminController {
     private String tokenHead;
 
 
-    @PreAuthorize("hasAuthority('25:后台用户管理')")
+    @PreAuthorize("hasRole('test')")
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
     public CommonResult userInfo(@PathVariable Integer id) {
@@ -81,7 +81,7 @@ public class UmsAdminController {
     @ApiOperation(value = "获取当前登陆用户信息")
     @GetMapping("/info")
     public CommonResult info(HttpServletRequest request) {
-        // TODO 这里实际是无效的，因为每一次先通过jwt过滤器，authentication即便为空也会重新赋值
+        // 每一次先通过jwt过滤器，authentication即便为空也会重新赋值
 //        logger.debug("authentication, {}", SecurityContextHolder.getContext().getAuthentication());
         Principal principal = request.getUserPrincipal();
         if (principal == null) {
@@ -131,8 +131,8 @@ public class UmsAdminController {
     @ApiOperation(value = "登出功能")
     @PostMapping("/logout")
     public CommonResult logout(HttpServletRequest request) {
-        // 注销当前用户
-        // TODO 测试发现，安全上下文中清空认证没有意义,因为每次新请求，这个莫名就清空了
+        // 因为jwt是无状态的，注销用户实际上就是令jwt失效。
+        //  测试发现，安全上下文中清空认证没有意义,因为每次请求处理后，这个莫名就清空了。而新请求来的时候，jwt过滤器会再次设置authentication
 //        SecurityContextHolder.getContext().setAuthentication(null);
         Principal principal = request.getUserPrincipal();
         if (principal == null) {

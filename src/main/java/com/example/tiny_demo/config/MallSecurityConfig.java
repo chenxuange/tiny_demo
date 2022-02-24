@@ -53,13 +53,11 @@ public class MallSecurityConfig extends SecurityConfig {
                 for (UmsResourceDo resource : resourceList) {
                     // 核心：保存了资源的所有权限映射
                     // 资源地址->安全配置（资源id+资源名字）
-                    map.put(resource.getUrl(), new org.springframework.security.access.SecurityConfig(resource.getId() + ":" + resource.getName()));
+                    map.put(resource.getUrl(), new org.springframework.security.access.SecurityConfig(resource.getId() + ":" + resource.getName().trim()));
                 }
                 return map;
             }
         };
     }
-
-
 
 }

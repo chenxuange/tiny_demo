@@ -165,7 +165,7 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         // 更新密码
         umsAdminDO.setPassword(passwordEncoder.encode(updatePasswordParam.getNewPassword()));
         adminMapper.updateByIdOrUsername(umsAdminDO);
-        // TODO 1. 更改密码时：当用户更改密码时，请注意用户数据库中的更改密码时间，因此当更改密码时间大于令牌创建时间时，令牌无效
+        // 更改密码时：当用户更改密码时，请注意用户数据库中的更改密码时间，因此当更改密码时间大于令牌创建时间时，令牌无效
         updateOperatorTime(null, updatePasswordParam.getUsername(), null);
     }
 

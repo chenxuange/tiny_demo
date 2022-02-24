@@ -5,6 +5,7 @@ import com.example.tiny_demo.common.api.CommonResult;
 import com.example.tiny_demo.modules.ums.dto.UmsResourceParam;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.service.UmsResourceService;
+import com.example.tiny_demo.security.component.DynamicSecurityMetadataSource;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -22,6 +23,9 @@ public class UmsResourceController {
 
     @Autowired
     private UmsResourceService resourceService;
+
+    @Autowired(required = false)
+    private DynamicSecurityMetadataSource dynamicSecurityMetadataSource;
 
     @ApiOperation("根据id获取资源详情")
     @GetMapping("/{id}")
@@ -52,7 +56,7 @@ public class UmsResourceController {
     @PostMapping("/create")
     public CommonResult create(@RequestBody UmsResourceParam resourceParam) {
         UmsResourceDo umsResourceDo = resourceService.create(resourceParam);
-        // TODO 添加动态权限时需更新数据源
+        clearSecuritySource();
         return CommonResult.success(umsResourceDo);
     }
 
@@ -60,6 +64,7 @@ public class UmsResourceController {
     @PostMapping("/delete/{id}")
     public CommonResult delete(@PathVariable Integer id) {
         resourceService.delete(id);
+        clearSecuritySource();
         return CommonResult.success(null);
     }
 
@@ -67,8 +72,16 @@ public class UmsResourceController {
     @PostMapping("/update/{id}")
     public CommonResult update(@PathVariable Integer id,@RequestBody UmsResourceParam resourceParam) {
         UmsResourceDo update = resourceService.update(id, resourceParam);
+        clearSecuritySource();
         return CommonResult.success(update);
     }
 
-
+    /**
+     * 清空安全元数据来源
+     */
+    private void clearSecuritySource() {
+        if (dynamicSecurityMetadataSource != null) {
+            dynamicSecurityMetadataSource.clear();
+        }
+    }
 }
