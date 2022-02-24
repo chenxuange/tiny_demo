@@ -8,12 +8,25 @@ spring:
     username: root
     password: 123456
   #    password: zzh1995@
-  main:
-    allow-circular-references: true
-#    password: zzh1995@
+  redis:
+    host: localhost
+    database: 1
+    port: 6379
+    password:
+    timeout: 3000ms
+
 mybatis:
   mapper-locations:
     - classpath:/mapper/**/*.xml
+
+
+logging:
+  level:
+    com.example.tiny_demo: debug
+  #    com.example.tiny_demo.modules.ums: debug
+  #    com.example.tiny_demo.security: debug
+
+## 自定义的配置
 
 jwt:
   tokenHeader: Authorization #JWT存储的请求头
@@ -21,11 +34,6 @@ jwt:
   expiration: 604800 #JWT的超期限时间(60*60*24*7)
   tokenHead: 'Bearer '  #JWT负载中拿到开头
 
-logging:
-  level:
-    com.example.tiny_demo: debug
-#    com.example.tiny_demo.modules.ums: debug
-#    com.example.tiny_demo.security: debug
 
 secure:
   ignored:
