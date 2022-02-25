@@ -15,6 +15,13 @@ public interface UmsMenuService {
     UmsMenuDo selectById(Integer id);
 
     /**
+     * 根据用户id查找所有菜单
+     * @param adminId
+     * @return
+     */
+    List<UmsMenuDo> getMenuList(Integer adminId);
+
+    /**
      * 根据父类id搜索所有菜单
      * @param parentId
      * @param pageNum

@@ -45,5 +45,10 @@ public interface UmsMenuMapper {
     List<UmsMenuDo> getMenuListByRoleId(Integer roleId);
 
 
+    /**
+     * 根据用户id查找所有菜单
+     * @param adminId
+     * @return
+     */
     List<UmsMenuDo> getMenuList(Integer adminId);
 }

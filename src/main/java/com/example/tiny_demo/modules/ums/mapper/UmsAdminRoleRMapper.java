@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UmsAdminRoleRMapper {
     /**
-     * 根据用户id删除关系记录
+     * 根据用户id删除关系
      * @param adminId
      */
     void delete(Integer adminId);
@@ -17,4 +17,11 @@ public interface UmsAdminRoleRMapper {
      * @param adminRoleRList
      */
     void insertBatch(List<UmsAdminRoleR> adminRoleRList);
+
+    /**
+     * 根据角色id查询所有关系记录
+     * @param roleId
+     * @return
+     */
+    List<UmsAdminRoleR> selectByRoleId(Integer roleId);
 }

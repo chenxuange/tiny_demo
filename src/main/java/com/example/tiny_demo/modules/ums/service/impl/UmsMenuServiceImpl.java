@@ -23,6 +23,11 @@ public class UmsMenuServiceImpl implements UmsMenuService {
     private UmsMenuMapper menuMapper;
 
     @Override
+    public List<UmsMenuDo> getMenuList(Integer adminId) {
+        return menuMapper.getMenuList(adminId);
+    }
+
+    @Override
     public UmsMenuDo selectById(Integer id) {
         List<Integer> ids = new ArrayList<>();
         ids.add(id);

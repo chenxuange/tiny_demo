@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户操作service
@@ -25,7 +26,7 @@ public interface UmsAdminService {
      * 注册功能
      */
     @Transactional
-    UmsAdminDO register(UmsAdminParam umsAdminParam);
+    void register(UmsAdminParam umsAdminParam);
 
 
 
@@ -76,7 +77,7 @@ public interface UmsAdminService {
     void updatePassword(UpdateAdminPasswordParam updatePasswordParam);
 
     /**
-     * 根基用户id获取用户
+     * 根据用户id获取用户
      * @param id
      * @return
      */
@@ -89,7 +90,7 @@ public interface UmsAdminService {
      * @return
      */
     @Transactional
-    UmsAdminDO updateUser(Integer id, UmsAdminParam adminParam);
+    void updateUser(Integer id, UmsAdminParam adminParam);
 
     /**
      * 登录用户，jwt返回token
@@ -102,7 +103,7 @@ public interface UmsAdminService {
      * @param username
      * @return
      */
-    public UserDetails loadUserByUsername(String username);
+    UserDetails loadUserByUsername(String username);
 
     /**
      * 修改指定用户状态
@@ -118,4 +119,11 @@ public interface UmsAdminService {
      */
     @Transactional
     void logout(String name);
+
+    /**
+     * 获取当前登录用户信息
+     * @param username
+     * @return
+     */
+    Map<String, Object> info(String username);
 }

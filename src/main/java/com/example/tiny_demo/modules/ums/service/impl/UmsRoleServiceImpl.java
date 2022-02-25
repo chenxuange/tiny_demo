@@ -67,7 +67,7 @@ public class UmsRoleServiceImpl implements UmsRoleService {
     }
 
     @Override
-    public UmsRoleDo create(UmsRoleParam roleParam) {
+    public void create(UmsRoleParam roleParam) {
         // 实际数据库中角色表中应该给name加唯一约束
         UmsRoleDo query = new UmsRoleDo();
         query.setName(roleParam.getName());
@@ -82,22 +82,22 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         roleDo.setStatus(1);
         // TODO 角色表中，后台用户数量和sort是什么
         roleMapper.insert(roleDo);
-        return roleDo;
     }
 
     @Override
-    public UmsRoleDo update(Integer id, UmsRoleDo roleDo) {
+    public void update(Integer id, UmsRoleParam roleParam) {
         List<UmsRoleDo> list = roleMapper.selectById(id);
         if(CollectionUtils.isEmpty(list)) {
             Asserts.fail("该角色不存在");
         }
+        UmsRoleDo roleDo = new UmsRoleDo();
+        BeanUtils.copyProperties(roleParam, roleDo);
         roleDo.setId(id);
         roleMapper.updateById(roleDo);
-        return roleDo;
     }
 
     @Override
-    public UmsRoleDo updateStatus(Integer id, Integer status) {
+    public void updateStatus(Integer id, Integer status) {
         List<UmsRoleDo> list = roleMapper.selectById(id);
         if(CollectionUtils.isEmpty(list)) {
             Asserts.fail("该角色不存在");
@@ -106,17 +106,17 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         roleDo.setId(id);
         roleDo.setStatus(status);
         roleMapper.updateById(roleDo);
-        return roleDo;
+        // TODO 移除资源缓存. 角色状态可能变为关停，那么下属资源不可用，导致用户资源变更
     }
 
     @Override
-    public List<Integer> deleteBatch(List<Integer> ids) {
+    public void deleteBatch(List<Integer> ids) {
         roleMapper.deleteBatchIds(ids);
-        return ids;
+        // TODO 移除资源缓存。删除角色时，用户不变更，但用户资源发生变更
     }
 
     @Override
-    public List<UmsRoleMenuR> allocMenu(Integer roleId, List<Integer> menuIds) {
+    public void allocMenu(Integer roleId, List<Integer> menuIds) {
         // 先判断角色id是否存在，再判断菜单id是否存在
         List<UmsRoleDo> roleDoList = roleMapper.selectById(roleId);
         if(CollectionUtils.isEmpty(roleDoList)) {
@@ -136,11 +136,10 @@ public class UmsRoleServiceImpl implements UmsRoleService {
             return r;
         }).collect(Collectors.toList());
         roleMenuRMapper.insertBatch(list);
-        return list;
     }
 
     @Override
-    public List<UmsRoleResourceR> allocResource(Integer roleId, List<Integer> resourceIds) {
+    public void allocResource(Integer roleId, List<Integer> resourceIds) {
         // 先判断角色id是否存在，再判断资源id是否存在
         List<UmsRoleDo> roleDoList = roleMapper.selectById(roleId);
         if(CollectionUtils.isEmpty(roleDoList)) {
@@ -160,11 +159,8 @@ public class UmsRoleServiceImpl implements UmsRoleService {
             return r;
         }).collect(Collectors.toList());
         roleResourceRMapper.insertBatch(list);
-        return list;
+        // TODO 移除用户资源。角色重新分配资源，导致用户资源变更
     }
 
-    @Override
-    public List<UmsMenuDo> getMenuList(Integer adminId) {
-        return menuMapper.getMenuList(adminId);
-    }
+
 }

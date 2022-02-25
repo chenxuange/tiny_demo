@@ -53,13 +53,12 @@ public class UmsResourceServiceImpl implements UmsResourceService {
     };
 
     @Override
-    public UmsResourceDo create(UmsResourceParam resourceParam) {
+    public void create(UmsResourceParam resourceParam) {
         // 实际插入时，name和url应该时唯一约束，因此库中暂时添加了name唯一约束
         UmsResourceDo resourceDo = new UmsResourceDo();
         BeanUtils.copyProperties(resourceParam, resourceDo);
         resourceDo.setCreateTime(new Date());
         resourceMapper.insert(resourceDo);
-        return resourceDo;
     }
 
     @Override
@@ -69,10 +68,11 @@ public class UmsResourceServiceImpl implements UmsResourceService {
             Asserts.fail("该用户不存在");
         }
         resourceMapper.deleteById(id);
+        // TODO 移除用户资源缓存。删除某个资源，可能导致用户资源更新
     }
 
     @Override
-    public UmsResourceDo update(Integer id, UmsResourceParam resourceParam) {
+    public void update(Integer id, UmsResourceParam resourceParam) {
         // 更新前先查询
         List<UmsResourceDo> list = resourceMapper.selectById(id);
         if(CollectionUtils.isEmpty(list)) {
@@ -82,6 +82,6 @@ public class UmsResourceServiceImpl implements UmsResourceService {
         BeanUtils.copyProperties(resourceParam, umsResourceDo);
         umsResourceDo.setId(id);
         resourceMapper.updateById(umsResourceDo);
-        return umsResourceDo;
+        // TODO 移除用户资源。某个资源更新后，用户资源也可能发生更新
     }
 }

@@ -3,7 +3,6 @@ package com.example.tiny_demo.modules.ums.service;
 import com.example.tiny_demo.modules.ums.dto.UmsResourceParam;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.github.pagehelper.PageInfo;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public interface UmsResourceService {
      * @param resourceParam
      */
     @Transactional
-    UmsResourceDo create(UmsResourceParam resourceParam);
+    void create(UmsResourceParam resourceParam);
 
     /**
      * 删除资源
@@ -52,9 +51,8 @@ public interface UmsResourceService {
      * 更新资源
      * @param id
      * @param resourceParam
-     * @return
      */
     @Transactional
-    UmsResourceDo update(Integer id, UmsResourceParam resourceParam);
+    void update(Integer id, UmsResourceParam resourceParam);
 
 }

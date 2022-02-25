@@ -40,57 +40,46 @@ public interface UmsRoleService {
     /**
      * 新增角色
      * @param roleParam
-     * @return
      */
     @Transactional
-    UmsRoleDo create(UmsRoleParam roleParam);
+    void create(UmsRoleParam roleParam);
 
     /**
-     * 更新角色
+     * 更新角色一般信息，不影响其他
      * @param id
-     * @param roleDo
-     * @return
+     * @param roleParam
      */
     @Transactional
-    UmsRoleDo update(Integer id, UmsRoleDo roleDo);
+    void update(Integer id, UmsRoleParam roleParam);
 
     /**
      * 更新角色状态
      * @param id
      * @param status
-     * @return
      */
     @Transactional
-    UmsRoleDo updateStatus(Integer id, Integer status);
+    void updateStatus(Integer id, Integer status);
 
     /**
      * 批量删除角色
      * @param ids
-     * @return
      */
     @Transactional
-    List<Integer> deleteBatch(List<Integer> ids);
+    void deleteBatch(List<Integer> ids);
 
     /**
      * 给角色分配菜单
      * @param roleId
      * @param menuIds
-     * @return
      */
-    List<UmsRoleMenuR> allocMenu(Integer roleId, List<Integer> menuIds);
+    void allocMenu(Integer roleId, List<Integer> menuIds);
 
     /**
      * 给角色分配资源
      * @param roleId
      * @param resourceIds
-     * @return
      */
-    List<UmsRoleResourceR> allocResource(Integer roleId, List<Integer> resourceIds);
+    void allocResource(Integer roleId, List<Integer> resourceIds);
 
-    /**
-     * 根据用户id查找所有菜单
-     * @param id
-     * @return
-     */
-    List<UmsMenuDo> getMenuList(Integer adminId);
+
 }

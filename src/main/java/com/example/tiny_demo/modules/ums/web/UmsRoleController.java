@@ -61,45 +61,44 @@ public class UmsRoleController {
     @PostMapping("/create")
     public CommonResult<Object> create(@RequestBody UmsRoleParam roleParam) {
         //  实际不需要考虑这么多，比如增删改有专门的权限控制框架控制，业务逻辑只需要考虑执行功能
-        UmsRoleDo roleDo = roleService.create(roleParam);
-        return CommonResult.success(roleDo);
-
+        roleService.create(roleParam);
+        return CommonResult.success("添加角色完成");
     }
 
     @ApiOperation("修改角色")
     @PostMapping("/update/{id}")
-    public CommonResult<Object> update(@PathVariable Integer id, @RequestBody UmsRoleDo roleDo) {
-        UmsRoleDo update = roleService.update(id, roleDo);
-        return CommonResult.success(update);
+    public CommonResult<Object> update(@PathVariable Integer id, @RequestBody UmsRoleParam roleParam) {
+        roleService.update(id, roleParam);
+        return CommonResult.success("更新角色信息完成");
     }
 
     @ApiOperation("修改角色状态")
     @PostMapping("/updateStatus/{id}")
     public CommonResult<Object> updateStatus(@PathVariable Integer id, @RequestParam Integer status) {
-        UmsRoleDo roleDo = roleService.updateStatus(id, status);
-        return CommonResult.success(roleDo);
+        roleService.updateStatus(id, status);
+        return CommonResult.success("修改角色状态完成");
     }
 
     @ApiOperation("给角色分配菜单")
     @PostMapping("/allocMenu/{roleId}")
     public CommonResult<Object> allocMenu(@PathVariable Integer roleId, @RequestParam List<Integer> menuIds) {
-        List<UmsRoleMenuR> umsRoleMenuRS = roleService.allocMenu(roleId, menuIds);
-        return CommonResult.success(umsRoleMenuRS);
+        roleService.allocMenu(roleId, menuIds);
+        return CommonResult.success(null);
 
     }
 
     @ApiOperation("给角色分配资源")
     @PostMapping("/allocResource/{roleId}")
     public CommonResult<Object> allocResource(@PathVariable Integer roleId, @RequestParam List<Integer> resourceIds){
-        List<UmsRoleResourceR> list = roleService.allocResource(roleId, resourceIds);
-        return CommonResult.success(list);
+         roleService.allocResource(roleId, resourceIds);
+        return CommonResult.success(null);
 
     }
 
     @ApiOperation("批量删除角色")
     @PostMapping("/deleteBatch")
     public CommonResult<Object> deleteBatch(@RequestParam List<Integer> ids){
-        List<Integer> list = roleService.deleteBatch(ids);
-        return CommonResult.success(ids);
+        roleService.deleteBatch(ids);
+        return CommonResult.success(null);
     }
 }

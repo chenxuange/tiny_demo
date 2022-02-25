@@ -55,9 +55,9 @@ public class UmsResourceController {
     @ApiOperation(value = "添加后台资源")
     @PostMapping("/create")
     public CommonResult create(@RequestBody UmsResourceParam resourceParam) {
-        UmsResourceDo umsResourceDo = resourceService.create(resourceParam);
+        resourceService.create(resourceParam);
         clearSecuritySource();
-        return CommonResult.success(umsResourceDo);
+        return CommonResult.success(null);
     }
 
     @ApiOperation(value = "根据id删除后台资源")
@@ -71,9 +71,9 @@ public class UmsResourceController {
     @ApiOperation(value = "修改后台资源")
     @PostMapping("/update/{id}")
     public CommonResult update(@PathVariable Integer id,@RequestBody UmsResourceParam resourceParam) {
-        UmsResourceDo update = resourceService.update(id, resourceParam);
+        resourceService.update(id, resourceParam);
         clearSecuritySource();
-        return CommonResult.success(update);
+        return CommonResult.success(null);
     }
 
     /**

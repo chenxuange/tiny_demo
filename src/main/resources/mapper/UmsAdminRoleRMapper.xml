@@ -16,4 +16,10 @@
         FROM ums_admin_role_relation
         WHERE admin_id = #{adminId}
     </delete>
+    <select id="selectByRoleId" resultType="com.example.tiny_demo.modules.ums.model.UmsAdminRoleR">
+        select ar.* from ums_admin_role_relation ar
+        <if test="roleId != null">
+            where ar.role_id = #{roleId}
+        </if>
+    </select>
 </mapper>

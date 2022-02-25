@@ -2,7 +2,6 @@ package com.example.tiny_demo.service;
 
 
 import com.example.tiny_demo.common.service.RedisService;
-import com.example.tiny_demo.modules.ums.service.impl.UmsAdminCacheServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,9 +15,9 @@ public class RedisServiceTest {
 
     @Test
     public void setTest() {
-        String key = "ukraine";
+        String key = "ukraine fail";
         Integer integer = -1;
-        redisService.set(key, integer);
+        redisService.set(key, integer, 5);
     }
 
     @Test

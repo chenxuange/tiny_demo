@@ -87,22 +87,8 @@ public class UmsAdminController {
         if (principal == null) {
             return CommonResult.fail(ResultCode.UNAUTHENTICATED, null);
         }
-        // 用户已经登录了
-        String name = principal.getName();
-        UmsAdminDO umsAdmin = adminService.getAdminByUsername(name);
-        logger.debug("umsAdmin, {}", umsAdmin);
-        Map<String, Object> data = new HashMap<>();
-        data.put("username", umsAdmin.getUsername());
-        data.put("menus", roleService.getMenuList(umsAdmin.getId()));
-        data.put("icon", umsAdmin.getIcon());
-        List<UmsRoleDo> roleList = adminService.getRoleList(umsAdmin.getId());
-        if(!CollectionUtils.isEmpty(roleList)){
-            List<String> roles = roleList.stream().map(UmsRoleDo::getName).collect(Collectors.toList());
-            data.put("roles",roles);
-        }else{
-            data.put("roles",new ArrayList<>());
-        }
-        return CommonResult.success(data);
+        Map<String, Object> info = adminService.info(principal.getName());
+        return CommonResult.success(info);
     }
 
     @ApiOperation(value = "根据用户名或姓名以及分页参数获取用户列表")
@@ -160,8 +146,8 @@ public class UmsAdminController {
     @ApiOperation(value = "用户注册")
     @PostMapping("/register")
     public CommonResult register(@Validated @RequestBody UmsAdminParam adminParam) {
-        UmsAdminDO register = adminService.register(adminParam);
-        return CommonResult.success(register);
+        adminService.register(adminParam);
+        return CommonResult.success("用户注册完成");
     }
 
     @ApiOperation("获取指定用户的角色")
@@ -183,8 +169,8 @@ public class UmsAdminController {
     @PostMapping("/update/{id}")
     public CommonResult updateUser(@PathVariable Integer id,
                                    @Validated @RequestBody UmsAdminParam adminParam) {
-        UmsAdminDO umsAdminDO = adminService.updateUser(id, adminParam);
-        return CommonResult.success(umsAdminDO);
+        adminService.updateUser(id, adminParam);
+        return CommonResult.success(null);
     }
 
     @ApiOperation(value = "修改指定用户密码")
