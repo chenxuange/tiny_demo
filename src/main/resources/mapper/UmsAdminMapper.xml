@@ -118,4 +118,12 @@
             where username like #{keyword} or nick_name like #{keyword}
         </if>
     </select>
+    <select id="getAdminIdList" resultType="java.lang.Integer">
+        select a.id
+        from ums_admin a
+                 JOIN ums_admin_role_relation ar on a.id = ar.admin_id
+                 join ums_role_resource_relation rr on rr.role_id = ar.role_id
+                 right join ums_resource r on rr.resource_id = r.id
+        where r.id = #{resourceId}
+    </select>
 </mapper>

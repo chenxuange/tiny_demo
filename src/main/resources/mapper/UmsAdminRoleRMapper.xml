@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.tiny_demo.modules.ums.mapper.UmsAdminRoleRMapper">
+    <resultMap id="UmsAdminRoleRMap" type="com.example.tiny_demo.modules.ums.model.UmsAdminRoleR">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="admin_id" property="adminId"/>
+    </resultMap>
     <insert id="insertBatch" parameterType="list">
         INSERT INTO ums_admin_role_relation
         ( admin_id, role_id )
@@ -16,7 +21,7 @@
         FROM ums_admin_role_relation
         WHERE admin_id = #{adminId}
     </delete>
-    <select id="selectByRoleId" resultType="com.example.tiny_demo.modules.ums.model.UmsAdminRoleR">
+    <select id="selectByRoleId" resultMap="UmsAdminRoleRMap">
         select ar.* from ums_admin_role_relation ar
         <if test="roleId != null">
             where ar.role_id = #{roleId}

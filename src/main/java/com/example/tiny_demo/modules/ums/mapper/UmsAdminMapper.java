@@ -47,4 +47,11 @@ public interface UmsAdminMapper {
      * @return
      */
     int updateByIdOrUsername(UmsAdminDO adminDO);
+
+    /**
+     * 根据资源id找到拥有本资源的用户id列表
+     * @param resourceId
+     * @return
+     */
+    List<Integer> getAdminIdList(Integer resourceId);
 }
