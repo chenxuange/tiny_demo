@@ -1,24 +1,16 @@
 package com.example.tiny_demo.config;
 
-import com.example.tiny_demo.domain.LoginUserDetails;
-import com.example.tiny_demo.modules.ums.model.UmsAdminDO;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.example.tiny_demo.modules.ums.service.UmsResourceService;
 import com.example.tiny_demo.security.component.DynamicSecurityService;
 import com.example.tiny_demo.security.config.SecurityConfig;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -31,28 +23,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class MallSecurityConfig extends SecurityConfig {
-    @Autowired
-    private UmsAdminService adminService;
-
-    @Autowired
-    private UmsResourceService resourceService;
-
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(UmsAdminService adminService) {
         //获取登录用户信息
         return username -> adminService.loadUserByUsername(username);
     }
 
     @Bean
-    public DynamicSecurityService dynamicSecurityService() {
+    public DynamicSecurityService dynamicSecurityService(UmsResourceService resourceService) {
         // 函数式接口
         return new DynamicSecurityService() {
             @Override
             public Map<String, ConfigAttribute> loadDataSource() {
-                // TODO 解决创建时，resourceService为空问题
-                if (resourceService == null) {
-                    return null;
-                }
                 Map<String, ConfigAttribute> map = new ConcurrentHashMap<>();
                 List<UmsResourceDo> resourceList = resourceService.list(new UmsResourceDo());
                 for (UmsResourceDo resource : resourceList) {
