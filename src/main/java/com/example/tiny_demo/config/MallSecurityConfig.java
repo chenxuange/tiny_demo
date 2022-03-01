@@ -10,6 +10,7 @@ import com.example.tiny_demo.security.config.SecurityConfig;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.ConfigAttribute;
@@ -48,6 +49,10 @@ public class MallSecurityConfig extends SecurityConfig {
         return new DynamicSecurityService() {
             @Override
             public Map<String, ConfigAttribute> loadDataSource() {
+                // TODO 解决创建时，resourceService为空问题
+                if (resourceService == null) {
+                    return null;
+                }
                 Map<String, ConfigAttribute> map = new ConcurrentHashMap<>();
                 List<UmsResourceDo> resourceList = resourceService.list(new UmsResourceDo());
                 for (UmsResourceDo resource : resourceList) {

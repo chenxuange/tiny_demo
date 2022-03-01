@@ -34,8 +34,8 @@ import java.io.IOException;
  */
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+    @Autowired
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     @Autowired
     private AccessDeniedHandler restfulAccessDeniedHandler;
@@ -52,25 +52,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     private DynamicSecurityFilter securityFilter;
 
-//    // 三个有条件的生成bean
-//    @ConditionalOnBean(DynamicSecurityService.class)
-//    @Bean
-//    public DynamicSecurityMetadataSource dynamicSecurityMetadataSource() {
-//        return new DynamicSecurityMetadataSource();
-//    }
-//
-//    @ConditionalOnBean(DynamicSecurityService.class)
-//    @Bean
-//    public DynamicAccessDecisionManager dynamicAccessDecisionManager() {
-//        return new DynamicAccessDecisionManager();
-//    }
-//
+    // 三个有条件的生成bean
     @ConditionalOnBean(DynamicSecurityService.class)
     @Bean
-    public DynamicSecurityFilter dynamicSecurityFilter() {
-        return new DynamicSecurityFilter();
+    public DynamicAccessDecisionManager dynamicAccessDecisionManager() {
+        return new DynamicAccessDecisionManager();
     }
 
+    @ConditionalOnBean(DynamicSecurityService.class)
+    @Bean
+    public DynamicSecurityMetadataSource dynamicSecurityMetadataSource() {
+        return new DynamicSecurityMetadataSource();
+    }
+
+    // TODO 出现循环依赖就是这个地方
+    @ConditionalOnBean(DynamicSecurityService.class)
+    @Bean
+    public  DynamicSecurityFilter dynamicSecurityFilter() {
+        return new DynamicSecurityFilter();
+    }
 
     /**
      * 实际上，spring-security中这个配置生效，（不去重写本方法）就会存在一种默认安全实现。
@@ -108,12 +108,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 // 自定义权限拦截器JWT过滤器,完成认证
                 .and()
-                .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        System.out.println("securityService, "+ securityService.getClass().getName());
-        System.out.println("securityFilter, "+ securityFilter);
+                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        System.out.println(securityService);
+        System.out.println(securityFilter);
         if(securityService != null) {
-            // 自定义权限过滤拦截器，完成鉴权
-//            registry.and().addFilterBefore(dynamicSecurityFilter(), FilterSecurityInterceptor.class);
+//             自定义权限过滤拦截器，完成鉴权
+            registry.and().addFilterBefore(securityFilter, FilterSecurityInterceptor.class);
         }
     }
 
@@ -160,15 +160,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-
 //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 //        // 内存中设置用户配合默认的安全配置，从而进入登录页面
 //        auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder().encode("123")).roles("admin");
 //    }
 
-    public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
-        return new JwtAuthenticationTokenFilter();
-    }
 }
 

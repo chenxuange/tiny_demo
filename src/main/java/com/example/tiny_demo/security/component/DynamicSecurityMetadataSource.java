@@ -30,7 +30,7 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
     // 初始化资源
     @PostConstruct
     public void init() {
-        dynamicSecurityService.loadDataSource();
+        configAttributeMap = dynamicSecurityService.loadDataSource();
     }
 
     // 释放资源，当资源有了更新后释放
@@ -69,8 +69,9 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
         return null;
     }
 
+    // TODO 必须true
     @Override
     public boolean supports(Class<?> clazz) {
-        return false;
+        return true;
     }
 }

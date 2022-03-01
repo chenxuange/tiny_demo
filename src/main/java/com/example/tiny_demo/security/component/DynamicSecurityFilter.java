@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.SecurityMetadataSource;
 import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.intercept.InterceptorStatusToken;
@@ -20,7 +21,7 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
 
     public static final Logger logger = LoggerFactory.getLogger(DynamicSecurityFilter.class);
 
-    @Autowired(required = false)
+    @Autowired
     private DynamicSecurityMetadataSource securityMetadataSource;
 
     @Autowired
@@ -56,14 +57,22 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
 
     }
 
-    // TODO 不清楚
     @Override
     public Class<?> getSecureObjectClass() {
         return FilterInvocation.class;
+    }
+
+    // TODO 新增访问决策管理器
+    @Autowired
+    @Override
+    public void setAccessDecisionManager( AccessDecisionManager accessDecisionManager) {
+        super.setAccessDecisionManager(accessDecisionManager);
     }
 
     @Override
     public SecurityMetadataSource obtainSecurityMetadataSource() {
         return securityMetadataSource;
     }
+
+
 }

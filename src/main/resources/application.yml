@@ -1,15 +1,12 @@
 server:
   port: 8080
 
-
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mall_tiny?serverTimezone=Asia/Shanghai
     username: root
     password: 123456
   #    password: zzh1995@
-  main:
-    allow-circular-references: true
 #    password: zzh1995@
 mybatis:
   mapper-locations:

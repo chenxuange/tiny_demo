@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * 登录认证过滤器
  */
-//@Configuration
+@Configuration
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
