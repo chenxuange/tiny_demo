@@ -21,8 +21,8 @@ mybatis:
 
 logging:
   level:
-    com.example.tiny_demo: debug
-  #    com.example.tiny_demo.modules.ums: debug
+    #    com.example.tiny_demo: debug
+    com.example.tiny_demo.modules.ums: debug
   #    com.example.tiny_demo.security: debug
 
 ## 自定义的配置属性

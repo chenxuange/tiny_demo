@@ -24,4 +24,10 @@ public interface UmsAdminRoleRMapper {
      * @return
      */
     List<UmsAdminRoleR> selectByRoleId(Integer roleId);
+
+    /**
+     * 批量查询关系
+     * @param roleIds
+     */
+    List<UmsAdminRoleR> selectByRoleIds(List<Integer> roleIds);
 }

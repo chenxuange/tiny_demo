@@ -17,7 +17,7 @@ public interface UmsAdminCacheService {
     void setAdmin(UmsAdminDO admin);
 
     /**
-     * 获取后台用户缓存
+     * 根据username获取后台用户缓存
      * @param username
      * @return
      */
@@ -25,7 +25,7 @@ public interface UmsAdminCacheService {
 
 
     /**
-     * 删除后台用户缓存
+     * 通过adminId删除后台用户缓存
      * @param adminId
      */
     void delAdmin(Integer adminId);
@@ -59,6 +59,12 @@ public interface UmsAdminCacheService {
      * @param roleId
      */
     void delResourceListByRole(Integer roleId);
+
+    /**
+     * 批量删除后台资源缓存
+     * @param roleIds 角色id列表
+     */
+    void delResourceListByRoles(List<Integer> roleIds);
 
     /**
      * 根据资源id移除后台资源缓存

@@ -8,6 +8,7 @@ import com.example.tiny_demo.modules.ums.dto.UmsAdminParam;
 import com.example.tiny_demo.modules.ums.dto.UpdateAdminPasswordParam;
 import com.example.tiny_demo.modules.ums.mapper.*;
 import com.example.tiny_demo.modules.ums.model.*;
+import com.example.tiny_demo.modules.ums.service.UmsAdminCacheService;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
 import com.example.tiny_demo.modules.ums.service.UmsRoleService;
 import com.example.tiny_demo.security.utils.JwtTokenUtil;
@@ -34,11 +35,16 @@ import java.util.stream.Collectors;
  * 哪些情况需要加入缓存或删除缓存：
  * 1. 频繁查询的
  * 2. 删除和更新
+ *
+ *
  */
 @Service
 public class UmsAdminServiceImpl implements UmsAdminService {
 
     private static final Logger logger = LoggerFactory.getLogger(UmsAdminServiceImpl.class);
+
+    @Autowired
+    private UmsAdminCacheService adminCacheService;
 
     @Autowired
     private UmsRoleService roleService;
@@ -71,15 +77,21 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public UmsAdminDO getAdminByUsername(String username) {
-        // TODO 先查缓存
+        //  先查用户缓存
+        UmsAdminDO admin = adminCacheService.getAdmin(username);
+        if (admin != null) {
+            return admin;
+        }
         UmsAdminDO query = new UmsAdminDO();
         query.setUsername(username);
         List<UmsAdminDO> list = adminMapper.selectList(query);
         if (CollectionUtils.isEmpty(list)) {
             return null;
         }
-        // TODO 添加用户缓存
-        return list.get(0);
+        //  添加用户缓存
+        admin = list.get(0);
+        adminCacheService.setAdmin(admin);
+        return admin;
     }
 
     @Override
@@ -122,16 +134,18 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer adminId) {
         ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(id);
+        ids.add(adminId);
         List<UmsAdminDO> list = adminMapper.selectByIdBatch(ids);
         if (CollectionUtils.isEmpty(list)) {
             Asserts.fail("该用户不存在");
         }
-        // TODO 移除用户缓存
-        // TODO 移除资源缓存
         adminMapper.deleteByIdBatch(ids);
+        //  移除用户缓存
+        adminCacheService.delAdmin(adminId);
+        //  移除资源缓存
+        adminCacheService.delResourceList(adminId);
     }
 
     @Override
@@ -147,7 +161,8 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         }).collect(Collectors.toList());
         // 插入新的角色列表，实际上角色id应该保证是角色表中已有id，这个前端控制即可
         adminRoleRMapper.insertBatch(adminRoleRList);
-        // TODO 移除资源缓存。修改用户角色关系，实际用户信息不变，而用户资源发生变更
+        //  移除资源缓存。修改用户角色关系，实际用户信息不变，而用户资源发生变更
+        adminCacheService.delResourceList(adminId);
     }
 
     @Override
@@ -157,10 +172,17 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public List<UmsResourceDo> getResourceList(Integer adminId) {
-        // TODO 先查资源缓存
-        List<UmsResourceDo> list = resourceMapper.getResourceList(adminId);
-        // TODO 添加资源缓存
-        return list;
+        //  先查资源缓存
+        List<UmsResourceDo> resourceList = adminCacheService.getResourceList(adminId);
+        if (resourceList != null) {
+            // TODO 拿到了缓存
+            logger.debug("cache resourceList, {}", resourceList);
+            return resourceList;
+        }
+        resourceList = resourceMapper.getResourceList(adminId);
+        //  添加资源缓存
+        adminCacheService.setResourceList(adminId, resourceList);
+        return resourceList;
     }
 
     @Override
@@ -181,21 +203,21 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         // 更新密码
         umsAdminDO.setPassword(passwordEncoder.encode(updatePasswordParam.getNewPassword()));
         adminMapper.updateByIdOrUsername(umsAdminDO);
-        // TODO 移除用户缓存
         // 更改密码时：当用户更改密码时，请注意用户数据库中的更改密码时间，因此当更改密码时间大于令牌创建时间时，令牌无效
         updateOperatorTime(null, updatePasswordParam.getUsername(), null);
+        //  移除用户缓存
+        adminCacheService.delAdmin(umsAdminDO.getId());
     }
 
     @Override
-    public UmsAdminDO get(Integer id) {
-        // TODO 先查缓存
+    public UmsAdminDO get(Integer adminId) {
+        // 没有涉及用户jwt验证需要的实时信息变更
         ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(id);
+        ids.add(adminId);
         List<UmsAdminDO> list = adminMapper.selectByIdBatch(ids);
         if (CollectionUtils.isEmpty(list)) {
             return null;
         }
-        // TODO 添加用户缓存
         return list.get(0);
     }
 
@@ -211,7 +233,8 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         BeanUtils.copyProperties(adminParam, adminDO);
         adminDO.setId(id);
         adminMapper.updateByIdOrUsername(adminDO);
-        // TODO 移除用户缓存
+        //  移除用户缓存
+        adminCacheService.delAdmin(id);
     }
 
     @Override
@@ -291,18 +314,19 @@ public class UmsAdminServiceImpl implements UmsAdminService {
     }
 
     @Override
-    public void updateStatus(Integer id, Integer status) {
-        ArrayList<Integer> ids = new ArrayList<>();
-        ids.add(id);
+    public void updateStatus(Integer adminId, Integer status) {
+        List<Integer> ids = new ArrayList<>();
+        ids.add(adminId);
         List<UmsAdminDO> list = adminMapper.selectByIdBatch(ids);
         if (CollectionUtils.isEmpty(list)) {
             Asserts.fail("该用户不存在");
         }
         UmsAdminDO adminDO = new UmsAdminDO();
-        adminDO.setId(id);
+        adminDO.setId(adminId);
         adminDO.setStatus(status);
         adminMapper.updateByIdOrUsername(adminDO);
-        // TODO 移除用户缓存
+        //  移除用户缓存
+        adminCacheService.delAdmin(adminDO.getId());
     }
 
     @Override

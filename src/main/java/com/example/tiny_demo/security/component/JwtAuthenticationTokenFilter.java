@@ -46,6 +46,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             // TODO 这里先前设置的authentication无效，是什么原因
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // 根据用户名查询并封装
+                // TODO 每一次新的请求，都封装一次用户信息和资源
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 // 待删，测试token ------------------------------------

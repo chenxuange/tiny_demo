@@ -5,6 +5,7 @@ import com.example.tiny_demo.modules.ums.dto.UmsRoleParam;
 import com.example.tiny_demo.modules.ums.mapper.*;
 import com.example.tiny_demo.modules.ums.mapper.UmsRoleResourceRMapper;
 import com.example.tiny_demo.modules.ums.model.*;
+import com.example.tiny_demo.modules.ums.service.UmsAdminCacheService;
 import com.example.tiny_demo.modules.ums.service.UmsRoleService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UmsRoleServiceImpl implements UmsRoleService {
+
+    @Autowired
+    private UmsAdminCacheService adminCacheService;
 
     @Autowired
     private UmsRoleMapper roleMapper;
@@ -106,13 +110,15 @@ public class UmsRoleServiceImpl implements UmsRoleService {
         roleDo.setId(id);
         roleDo.setStatus(status);
         roleMapper.updateById(roleDo);
-        // TODO 移除资源缓存. 角色状态可能变为关停，那么下属资源不可用，导致用户资源变更
+        //  移除资源缓存. 角色状态可能变为关停，那么下属资源不可用，导致用户资源变更
+        adminCacheService.delResourceListByRole(id);
     }
 
     @Override
     public void deleteBatch(List<Integer> ids) {
         roleMapper.deleteBatchIds(ids);
-        // TODO 移除资源缓存。删除角色时，用户不变更，但用户资源发生变更
+        //  移除资源缓存。删除角色时，用户不变更，但用户资源发生变更
+        adminCacheService.delResourceListByRoles(ids);
     }
 
     @Override
@@ -159,7 +165,8 @@ public class UmsRoleServiceImpl implements UmsRoleService {
             return r;
         }).collect(Collectors.toList());
         roleResourceRMapper.insertBatch(list);
-        // TODO 移除用户资源。角色重新分配资源，导致用户资源变更
+        //  移除用户资源。角色重新分配资源，导致用户资源变更
+        adminCacheService.delResourceListByRole(roleId);
     }
 
 

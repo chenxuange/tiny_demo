@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,16 +50,16 @@ public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
 
     @Override
     public void setAdmin(UmsAdminDO admin) {
+        logger.debug("setAdmin, {}", admin);
         // 根据用户名构造用户缓存键
         String key = REDIS_DATABASE + ":" + REDIS_KEY_ADMIN + ":" + admin.getUsername();
         redisService.set(key, admin, REDIS_EXPIRE);
-        logger.debug("setAdmin, admin = {}", admin);
     }
 
     @Override
     public UmsAdminDO getAdmin(String username) {
-        String key = REDIS_DATABASE + ":" + REDIS_KEY_ADMIN + ":" + username;
         logger.debug("getAdmin, username = {}", username);
+        String key = REDIS_DATABASE + ":" + REDIS_KEY_ADMIN + ":" + username;
         return (UmsAdminDO) redisService.get(key);
     }
 
@@ -74,6 +75,7 @@ public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
 
     @Override
     public void setResourceList(Integer adminId, List<UmsResourceDo> resourceList) {
+        logger.debug("setResourceList, {}", adminId);
         // 根据用户id构造资源缓存键
         String key = REDIS_DATABASE + ":" + REDIS_KEY_RESOURCE_LIST + ":" + adminId;
         redisService.set(key, resourceList, REDIS_EXPIRE);
@@ -81,41 +83,53 @@ public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
 
     @Override
     public List<UmsResourceDo> getResourceList(Integer adminId) {
+        logger.debug("getResourceList, adminId = {}", adminId);
         String key = REDIS_DATABASE + ":" + REDIS_KEY_RESOURCE_LIST + ":" + adminId;
         return (List<UmsResourceDo>) redisService.get(key);
     }
 
     @Override
     public void delResourceList(Integer adminId) {
+        logger.debug("delResourceList, {}", adminId);
         String key = REDIS_DATABASE + ":" + REDIS_KEY_RESOURCE_LIST + ":" + adminId;
         redisService.delete(key);
-        logger.debug("delResourceList, {}", adminId);
+        logger.debug("key, {}", key);
     }
 
     @Override
     public void delResourceListByRole(Integer roleId) {
+//        logger.debug("delResourceListByRole, {}", roleId);
         // 先要去查，根据查的结果构造redis键
-        List<UmsAdminRoleR> relationList = adminRoleRMapper.selectByRoleId(roleId);
-        logger.debug("relationList, {}", relationList);
-        if(CollectionUtils.isEmpty(relationList))
+        List<Integer> roleIds = new ArrayList<>();
+        roleIds.add(roleId);
+        delResourceListByRoles(roleIds);
+    }
+
+    @Override
+    public void delResourceListByRoles(List<Integer> roleIds) {
+        logger.debug("delResourceListByRoles, {}", roleIds);
+        List<UmsAdminRoleR> relationList = adminRoleRMapper.selectByRoleIds(roleIds);
+        if(CollectionUtils.isEmpty(relationList)) {
             return;
+        }
         String keyPrefix = REDIS_DATABASE + ":" + REDIS_KEY_RESOURCE_LIST + ":";
         List<String> keys = relationList.stream().map(relation -> keyPrefix + relation.getAdminId()).collect(Collectors.toList());
-        logger.debug("keys, {}", keys);
         redisService.delete(keys);
-        logger.debug("delResourceListByRole, {}", roleId);
+        logger.debug("keys, {}", keys);
     }
 
     @Override
     public void delResourceListByResource(Integer resourceId) {
+        logger.debug("delResourceListByResource, {}", resourceId);
         // 先要去查，根据查的结果构造redis键
         // 根据资源id找出关联的用户id
         List<Integer> adminIdList = adminMapper.getAdminIdList(resourceId);
-        if(CollectionUtils.isEmpty(adminIdList))
+        if(CollectionUtils.isEmpty(adminIdList)) {
             return;
+        }
         String keyPrefix = REDIS_DATABASE + ":" + REDIS_KEY_RESOURCE_LIST + ":";
         List<String> keys = adminIdList.stream().map(adminId -> keyPrefix + adminId).collect(Collectors.toList());
         redisService.delete(keys);
-        logger.debug("delResourceListByResource, {}", resourceId);
+        logger.debug("keys, {}", keys);
     }
 }

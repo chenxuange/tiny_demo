@@ -56,6 +56,7 @@ public class UmsResourceController {
     @PostMapping("/create")
     public CommonResult create(@RequestBody UmsResourceParam resourceParam) {
         resourceService.create(resourceParam);
+        // 资源的创建导致安全元数据来源变动
         clearSecuritySource();
         return CommonResult.success(null);
     }
@@ -64,6 +65,7 @@ public class UmsResourceController {
     @PostMapping("/delete/{id}")
     public CommonResult delete(@PathVariable Integer id) {
         resourceService.delete(id);
+        // 资源的删除导致安全元数据来源变动
         clearSecuritySource();
         return CommonResult.success(null);
     }
@@ -72,6 +74,7 @@ public class UmsResourceController {
     @PostMapping("/update/{id}")
     public CommonResult update(@PathVariable Integer id,@RequestBody UmsResourceParam resourceParam) {
         resourceService.update(id, resourceParam);
+        // 资源的修改导致安全元数据来源变动
         clearSecuritySource();
         return CommonResult.success(null);
     }

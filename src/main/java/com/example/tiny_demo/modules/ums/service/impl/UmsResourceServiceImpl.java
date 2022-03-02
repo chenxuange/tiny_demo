@@ -4,6 +4,7 @@ import com.example.tiny_demo.common.exception.Asserts;
 import com.example.tiny_demo.modules.ums.dto.UmsResourceParam;
 import com.example.tiny_demo.modules.ums.mapper.UmsResourceMapper;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
+import com.example.tiny_demo.modules.ums.service.UmsAdminCacheService;
 import com.example.tiny_demo.modules.ums.service.UmsResourceService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -21,6 +22,10 @@ public class UmsResourceServiceImpl implements UmsResourceService {
 
     @Autowired
     private UmsResourceMapper resourceMapper;
+
+    @Autowired
+    private UmsAdminCacheService adminCacheService;
+
     @Override
     public List<UmsResourceDo> list(UmsResourceDo resourceDo) {
         List<UmsResourceDo> list = resourceMapper.selectList(resourceDo);
@@ -68,7 +73,9 @@ public class UmsResourceServiceImpl implements UmsResourceService {
             Asserts.fail("该用户不存在");
         }
         resourceMapper.deleteById(id);
-        // TODO 移除用户资源缓存。删除某个资源，可能导致用户资源更新
+        //  移除用户资源缓存。删除某个资源，可能导致用户资源更新
+        adminCacheService.delResourceListByResource(id);
+
     }
 
     @Override
@@ -82,6 +89,7 @@ public class UmsResourceServiceImpl implements UmsResourceService {
         BeanUtils.copyProperties(resourceParam, umsResourceDo);
         umsResourceDo.setId(id);
         resourceMapper.updateById(umsResourceDo);
-        // TODO 移除用户资源。某个资源更新后，用户资源也可能发生更新
+        //  移除用户资源。某个资源更新后，用户资源也可能发生更新
+        adminCacheService.delResourceListByResource(id);
     }
 }

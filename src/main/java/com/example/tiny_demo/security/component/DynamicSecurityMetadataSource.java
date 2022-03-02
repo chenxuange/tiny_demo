@@ -60,7 +60,7 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
         // TODO 若路径中不存在中文，requestUrl就是正常，否则会将中文转化为%xx等形式, 这时就需要转换
         String path = requestUrl;
         logger.debug("path, {}", path);
-        // 获取访问该路径所匹配到的资源列表
+        // 获取访问该路径所需要的资源列表
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         for(Map.Entry<String, ConfigAttribute> entry : configAttributeMap.entrySet()){
             String pattern = entry.getKey();
@@ -72,6 +72,7 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
             }
         }
         //  返回当前请求允许的安全配置属性集合
+        logger.info("need configAttributes, {}", configAttributes);
         return configAttributes;
     }
 

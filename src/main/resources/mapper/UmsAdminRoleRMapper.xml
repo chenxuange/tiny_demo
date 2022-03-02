@@ -27,4 +27,13 @@
             where ar.role_id = #{roleId}
         </if>
     </select>
+    <select id="selectByRoleIds" resultMap="UmsAdminRoleRMap">
+        select ar.* from ums_admin_role_relation ar
+        <if test="roleIds != null">
+            where ar.role_id in
+            <foreach collection="list" item="roleId" separator="," open="(" close=")">
+                #{roleId}
+            </foreach>
+        </if>
+    </select>
 </mapper>

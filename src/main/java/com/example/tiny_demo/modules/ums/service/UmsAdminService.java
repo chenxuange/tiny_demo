@@ -44,11 +44,11 @@ public interface UmsAdminService {
 
     /**
      * 删除指定用户
-     * @param id
+     * @param adminId
      * @return
      */
     @Transactional
-    void delete(Integer id);
+    void delete(Integer adminId);
 
     /**
      * 修改用户角色关系
@@ -78,10 +78,10 @@ public interface UmsAdminService {
 
     /**
      * 根据用户id获取用户
-     * @param id
+     * @param adminId
      * @return
      */
-    UmsAdminDO get(Integer id);
+    UmsAdminDO get(Integer adminId);
 
     /**
      * 更新用户信息
@@ -107,11 +107,11 @@ public interface UmsAdminService {
 
     /**
      * 修改指定用户状态
-     * @param id
+     * @param adminId
      * @param status
      */
     @Transactional
-    void updateStatus(Integer id, Integer status);
+    void updateStatus(Integer adminId, Integer status);
 
     /**
      * 注销用户

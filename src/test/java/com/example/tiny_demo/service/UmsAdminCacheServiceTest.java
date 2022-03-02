@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -67,6 +68,14 @@ public class UmsAdminCacheServiceTest {
 
     @Test
     @Order(233)
+    public void delResourceListByRolesTest() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        ids.add(5);
+        adminCacheService.delResourceListByRoles(ids);
+    }
+
+    @Test
+    @Order(234)
     public void delResourceListByResourceTest() {
         adminCacheService.delResourceListByResource(25);
     }
