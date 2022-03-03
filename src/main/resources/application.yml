@@ -12,7 +12,7 @@ spring:
     database: 1
     port: 6379
     password:
-    timeout: 3000ms
+    timeout: 100ms
 
 mybatis:
   mapper-locations:
@@ -23,7 +23,7 @@ logging:
   level:
     #    com.example.tiny_demo: debug
     com.example.tiny_demo.modules.ums: debug
-  #    com.example.tiny_demo.security: debug
+#    com.example.tiny_demo.security.aspect: debug
 
 ## 自定义的配置属性
 redis:

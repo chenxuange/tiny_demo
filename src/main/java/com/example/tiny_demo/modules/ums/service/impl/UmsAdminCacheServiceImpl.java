@@ -8,6 +8,7 @@ import com.example.tiny_demo.modules.ums.model.UmsAdminRoleR;
 import com.example.tiny_demo.modules.ums.model.UmsResourceDo;
 import com.example.tiny_demo.modules.ums.service.UmsAdminCacheService;
 import com.example.tiny_demo.modules.ums.service.UmsAdminService;
+import com.example.tiny_demo.security.anotation.CustomCacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 /**
  * 后台用户缓存service实现类
  */
+@CustomCacheException
 @Service
 public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
 
@@ -56,6 +58,7 @@ public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
         redisService.set(key, admin, REDIS_EXPIRE);
     }
 
+    @CustomCacheException
     @Override
     public UmsAdminDO getAdmin(String username) {
         logger.debug("getAdmin, username = {}", username);
@@ -81,6 +84,7 @@ public class UmsAdminCacheServiceImpl implements UmsAdminCacheService {
         redisService.set(key, resourceList, REDIS_EXPIRE);
     }
 
+    @CustomCacheException
     @Override
     public List<UmsResourceDo> getResourceList(Integer adminId) {
         logger.debug("getResourceList, adminId = {}", adminId);
