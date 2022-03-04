@@ -12,7 +12,7 @@ spring:
     database: 1
     port: 6379
     password:
-    timeout: 100ms
+    timeout: 100
 
 mybatis:
   mapper-locations:
