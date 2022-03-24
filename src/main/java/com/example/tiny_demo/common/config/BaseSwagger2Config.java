@@ -22,7 +22,7 @@ public abstract class BaseSwagger2Config {
     // 自定义swagger配置properties
     protected abstract SwaggerProperties swaggerProperties();
 
-    // Swagger实例Bean是Docket，所以必须通过配置Docket实例来配置Swaggger
+    // Swagger实例Bean是Docket，所以必须通过配置Docket实例来配置 swagger
     @Bean
     public Docket createRestApi() {
         // 实例化swagger的properties
@@ -41,7 +41,7 @@ public abstract class BaseSwagger2Config {
                 // paths： 这里是控制哪些路径的api会被显示出来
                 .paths(PathSelectors.any())
                 .build();
-        //  待定
+        //  swagger开启登录认证
         if (swaggerProperties.isEnableSecurity()) {
             docket.securitySchemes(securitySchemes()).securityContexts(securityContexts());
         }
@@ -61,7 +61,7 @@ public abstract class BaseSwagger2Config {
                 .build();
     }
 
-    // 设置认证
+    // swagger设置认证
     private List<ApiKey> securitySchemes() {
         //设置请求头信息
         List<ApiKey> result = new ArrayList<>();

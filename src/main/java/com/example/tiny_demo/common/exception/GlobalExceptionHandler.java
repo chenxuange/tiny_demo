@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * 全局异常处理
+ * 自定义全局异常处理类
  * 校验异常的三种情况：
  *
  * 1. 单一参数校验异常是 ConstraintViolationException

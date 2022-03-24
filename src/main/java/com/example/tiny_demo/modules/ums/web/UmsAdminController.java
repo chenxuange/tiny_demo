@@ -54,7 +54,7 @@ public class UmsAdminController {
     private String tokenHead;
 
 
-    @PreAuthorize("hasRole('test')")
+//    @PreAuthorize("hasRole('test')") // 为了测试 LoginUserDetails#getAuthorities方法中添加的 ROLE_test
     @ApiOperation(value = "获取指定用户信息", notes = "新增注意事项")
     @GetMapping("/{id}")
     public CommonResult userInfo(@PathVariable Integer id) {

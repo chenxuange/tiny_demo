@@ -7,6 +7,10 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * 参数类
+ * 前端传参对象：资源更新
+ */
 @Data
 @ApiModel(value = "UmsResourceParam", description = "前端资源参数")
 public class UmsResourceParam implements Serializable {

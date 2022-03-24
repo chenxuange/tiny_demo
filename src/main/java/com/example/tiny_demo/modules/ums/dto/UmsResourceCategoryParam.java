@@ -4,6 +4,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+/**
+ * 参数类
+ * 前端传参对象：资源分类更新
+ *
+ */
 @ApiModel(value = "UmsResourceCategoryParam对象", description = "前端资源分类传参")
 @Data
 public class UmsResourceCategoryParam {

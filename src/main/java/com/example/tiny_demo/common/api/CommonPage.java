@@ -10,9 +10,13 @@ import java.util.List;
  */
 @Getter
 public class CommonPage<T> {
+    // 页码
     private Integer pageNum;
+    // 页面尺寸
     private Integer pageSize;
+    // 总页数
     private Integer totalPage;
+    // 总条数
     private Long total;
     private List<T> list;
 

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 用于配置白名单资源路径
+ * 白名单资源路径配置类，放行不需要jwt判断的url, 如登录相关
  */
 @Getter
 @Setter

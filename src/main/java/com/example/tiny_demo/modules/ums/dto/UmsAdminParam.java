@@ -7,7 +7,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 /**
- * 用户参数类
+ * 参数类
+ * 前端传参对象：用户更新
  */
 @ApiModel(value = "UmsAdminParam", description = "前端用户参数")
 @Data

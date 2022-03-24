@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 动态权限决策管理器
+ * 动态访问权限决策管理器
  */
 public class DynamicAccessDecisionManager implements AccessDecisionManager {
     public static final Logger logger = LoggerFactory.getLogger(DynamicAccessDecisionManager.class);
@@ -33,16 +33,19 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         List<String> allAuthorize = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         // 访问接口需要的资源
+        logger.debug("Owned allAuthorize, {}", allAuthorize);
         for(ConfigAttribute configAttribute: configAttributes) {
+            // TODO 这里有个疑问，用户拥有一定数量资源，访问当前接口所需资源 authorities 有多个,
+            //  这种条件下，用户必须拥有全部的 authorities 才认为通过吗？ 暂时只要 authorities 中一条。
             String needAuthorize = configAttribute.getAttribute();
+            logger.debug("needAuthorize, {}", needAuthorize);
             if(allAuthorize.contains(needAuthorize)){
-                // 用户拥有访问接口需要的资源中任一条，都视为鉴权通过
-                logger.debug("haveAuthorized, {}", allAuthorize);
-                logger.debug("needAuthorize, {}", needAuthorize);
-                logger.debug("decide pass, {}", true);
+                // 用户拥有的资源是访问接口所需资源中任一条，都视为鉴权通过
+                logger.info("decide pass, authorization is granted");
                 return;
             }
         }
+        logger.debug("decide failed");
         throw new AccessDeniedException("请确认您的操作权限");
     }
 

@@ -4,12 +4,14 @@ import lombok.Data;
 
 /**
  * 通用返回对象
- * @param <T>
  */
 @Data
 public class CommonResult<T> {
+    // 状态码
     private long code;
+    // 提示消息
     private String message;
+    // 返回数据
     private T data;
 
     public CommonResult(long code, String message, T data) {
@@ -23,38 +25,39 @@ public class CommonResult<T> {
         return new CommonResult<T>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data);
     }
 
-    // 自定义失败返回
+    // 可定义完整信息的失败返回
     public static <T> CommonResult<T> fail(long code, String message, T data) {
         return new CommonResult<T>(code, message, data);
     }
 
-    // 自定义失败返回提示
+    // 可自定义提示信息的失败返回
     public static <T> CommonResult<T> fail(String message, T data) {
         return new CommonResult<T>(ResultCode.FAILED.getCode(), message, data);
     }
 
     // 默认失败返回
     public static <T> CommonResult<T> fail(T data) {
-        return new CommonResult<T>(ResultCode.FAILED.getCode(), ResultCode.FAILED.getMessage(), data);
+        return fail(ResultCode.FAILED, data);
     }
 
-    // 失败返回错误码
+    // 带错误码的失败返回
     public static <T> CommonResult<T> fail(IErrorCode errorCode, T data) {
         return new CommonResult<>(errorCode.getCode(), errorCode.getMessage(), data);
     }
 
-    // 校验失败返回
+    // 校验失败
     public static <T> CommonResult<T> validateFailed(String message, T data) {
         return new CommonResult<>(ResultCode.VALIDATE_FAILED.getCode(), message, data);
     }
 
-    // 没有权限拒绝登录返回
+    // 没有授权拒绝
     public static <T> CommonResult<T> unauthorized( T data) {
-        return new CommonResult<>(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getMessage(), data);
+        return fail(ResultCode.UNAUTHORIZED, data);
     }
 
+    // 认证失败拒绝
     public static <T> CommonResult<T> unauthenticated(T data) {
-        return new CommonResult<>(ResultCode.UNAUTHENTICATED.getCode(), ResultCode.UNAUTHENTICATED.getMessage(), data);
+        return fail(ResultCode.UNAUTHENTICATED, data);
 
     }
 }

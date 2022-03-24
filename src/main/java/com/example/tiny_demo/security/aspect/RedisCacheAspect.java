@@ -2,6 +2,9 @@ package com.example.tiny_demo.security.aspect;
 
 import com.example.tiny_demo.security.anotation.CustomCacheException;
 
+import io.lettuce.core.RedisCommandTimeoutException;
+import io.lettuce.core.RedisConnectionException;
+import io.lettuce.core.RedisException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -18,7 +21,6 @@ import java.lang.reflect.Method;
 
 /**
  * Redis缓存切面，防止Redis宕机影响正常业务逻辑
- * Created by macro on 2020/3/17.
  */
 @Aspect
 @Component
@@ -55,7 +57,7 @@ public class RedisCacheAspect {
             skipRedisCache = true;
             logger.warn(redisConnectionException.getMessage());
             logger.warn("if firstly Unable to connect to Redis, the rest of cache requests skip");
-        } catch (Throwable throwable) {
+        }catch (Throwable throwable) {
             //有CacheException注解的类打印异常就可
             if(curInvocationClass.isAnnotationPresent(CustomCacheException.class)) {
                 logger.debug("redis related while class with CustomCacheException");
@@ -69,7 +71,7 @@ public class RedisCacheAspect {
                 logger.debug("other exception");
             }
             // 打印以下异常即可，跳过redis继续执行其他
-            logger.warn(throwable.getMessage());
+            logger.warn("throwable, {}", throwable.getMessage());
         }
         return result;
     }

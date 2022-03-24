@@ -3,7 +3,7 @@ package com.example.tiny_demo.common.exception;
 import com.example.tiny_demo.common.api.IErrorCode;
 
 /**
- * 用户触发自定义异常
+ * 用户触发自定义API异常
  */
 public class Asserts {
 

@@ -7,7 +7,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 树形菜单结点，每个父级结点下存在子结点列表
+ * 展示类
+ * 前端展示对象：树形菜单结点，每个父级结点下存在子结点列表
  */
 @Data
 public class UmsMenuNode extends UmsMenuDo {

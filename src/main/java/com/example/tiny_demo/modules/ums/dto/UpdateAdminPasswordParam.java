@@ -5,6 +5,10 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * 参数类
+ * 前端传参对象：用户密码更新
+ */
 @ApiModel(value = "UpdateAdminPasswordParam对象", description = "前端更新密码参数")
 @Data
 public class UpdateAdminPasswordParam {

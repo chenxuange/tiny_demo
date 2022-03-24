@@ -17,9 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *动态权限数据源
+ *安全元数据源
  */
-
 public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
     public static final Logger logger = LoggerFactory.getLogger(DynamicSecurityMetadataSource.class);
@@ -65,14 +64,14 @@ public class DynamicSecurityMetadataSource implements FilterInvocationSecurityMe
         for(Map.Entry<String, ConfigAttribute> entry : configAttributeMap.entrySet()){
             String pattern = entry.getKey();
             if(antPathMatcher.match(pattern, path)) {
-                logger.debug("pattern, {}", pattern);
+                logger.debug("matched pattern, {}", pattern);
                 logger.debug("matched configAttribute, {}",entry.getValue());
                 // 若资源映射列表中的某个地址能够匹配当前路径，则把该地址对应的安全配置（资源id+资源名字）存入ConfigAttributes
                 configAttributes.add(entry.getValue());
             }
         }
         //  返回当前请求允许的安全配置属性集合
-        logger.info("need configAttributes, {}", configAttributes);
+        logger.debug("finally required configAttributes, {}", configAttributes);
         return configAttributes;
     }
 

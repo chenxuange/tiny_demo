@@ -175,8 +175,6 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         //  先查资源缓存
         List<UmsResourceDo> resourceList = adminCacheService.getResourceList(adminId);
         if (resourceList != null) {
-            // TODO 拿到了缓存
-            logger.debug("cache resourceList, {}", resourceList);
             return resourceList;
         }
         resourceList = resourceMapper.getResourceList(adminId);

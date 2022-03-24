@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * 自定义安全用户
+ * 自定义安全用户UserDetails实现
  */
 public class LoginUserDetails implements UserDetails {
     public static final Logger logger = LoggerFactory.getLogger(LoginUserDetails.class);
@@ -45,7 +45,7 @@ public class LoginUserDetails implements UserDetails {
              * 2. 根据 SecurityExpressionRoot 中 hasAuthority,实际上 defaultRolePrefix 设置为 null ,就不需要考虑前缀了
              */
         //   为了测试 UmsAdminController.userInfo() 方法上的注解 @PreAuthorize("hasAuthority('test')")
-            authorities.add(new SimpleGrantedAuthority("ROLE_test"));
+//            authorities.add(new SimpleGrantedAuthority("ROLE_test"));
         return authorities;
     }
 
@@ -59,7 +59,6 @@ public class LoginUserDetails implements UserDetails {
         return admin.getUsername();
     }
 
-    // TODO 为什么这三个都返回true
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -77,7 +76,7 @@ public class LoginUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        // 账号可用
+        // 账号状态为1表可用，否则禁用
         return Objects.equals(1, admin.getStatus());
     }
 

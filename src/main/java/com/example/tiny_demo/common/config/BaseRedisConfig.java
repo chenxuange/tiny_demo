@@ -30,7 +30,7 @@ public class BaseRedisConfig {
     @Autowired
     private RedisSerializer<Object> redisSerializer;
 
-    // 缓存管理器
+    // redis缓存管理器
     @Bean
     public RedisCacheManager redisCacheManager() {
         RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisConnectionFactory);
@@ -40,9 +40,9 @@ public class BaseRedisConfig {
         return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
     }
 
+    // redisTemplate操作redis
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-//        RedisSerializer<Object> serializer = redisSerializer();
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -53,14 +53,16 @@ public class BaseRedisConfig {
         return redisTemplate;
     }
 
+    // redis序列化
     @Bean
     public RedisSerializer<Object> redisSerializer() {
         //创建JSON序列化器
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        // json转化对象
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         //必须设置，否则无法将JSON转化为对象，会转化成Map类型
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,ObjectMapper.DefaultTyping.NON_FINAL);
+        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
         serializer.setObjectMapper(objectMapper);
         return serializer;
     }

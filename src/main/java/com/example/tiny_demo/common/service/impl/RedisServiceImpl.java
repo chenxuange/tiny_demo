@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 通用业务类：
  * RedisService实现类
  * 自动注入底层的RedisTemplate操作模板
  * 注意：
@@ -21,6 +22,7 @@ public class RedisServiceImpl implements RedisService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    // redis设置缓存，默认时间单位为秒
     @Override
     public void set(String key, Object value, long time) {
         redisTemplate.opsForValue().set(key, value, time, TimeUnit.SECONDS);

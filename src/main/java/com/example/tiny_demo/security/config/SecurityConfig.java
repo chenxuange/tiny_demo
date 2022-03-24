@@ -6,6 +6,7 @@ import com.example.tiny_demo.security.component.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,6 +25,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import springfox.documentation.spring.web.json.JsonSerializer;
 
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,7 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * 2. 默认任何请求都需要认证, 已经登陆就不需要
      * 3. 开启了表单登录，鉴于此，可以内存中配置一位用户，以实现认证通过，但也仅get请求可以通过
      * 小结：无法跨域，存在登陆表单, 无法执行post请求
-     *
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -82,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 允许访问不需要保护的资源路径，如swagger或登录相关等，否则swagger接口文档打不开
         for(String url : ignoreUrlsConfig.getUrls()) {
             registry.antMatchers(url).permitAll();
-            // 白名单路径访问后，authentication的principal是一个anonymousUser
+            // 访问白名单路径后，因为是直接放行，authentication的principal是一个anonymousUser
         }
         // 任何授权请求需要身份认证
         registry.and()
@@ -105,8 +106,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         if(dynamicSecurityService != null) {
             // 自定义权限过滤拦截器，完成鉴权。若鉴权失败，由 restfulAccessDeniedHandler 处理
+//            registry.and().addFilter(dynamicSecurityFilter());
             registry.and().addFilterBefore(dynamicSecurityFilter(), FilterSecurityInterceptor.class);
         }
+    }
+
+    // 目的是让DynamicSecurityFilter类型的过滤器只执行一次
+    @Bean
+    public FilterRegistrationBean registration(DynamicSecurityFilter filter) {
+        FilterRegistrationBean<DynamicSecurityFilter> filterFilterRegistrationBean = new FilterRegistrationBean<>(filter);
+        // 关键在这
+        filterFilterRegistrationBean.setEnabled(false);
+        return filterFilterRegistrationBean;
     }
 
 
