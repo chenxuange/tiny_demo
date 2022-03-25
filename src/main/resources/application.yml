@@ -22,11 +22,11 @@ mybatis:
     - classpath:/mapper/**/*.xml
 
 
-logging:
-  level:
-    #    com.example.tiny_demo: debug
-    com.example.tiny_demo.modules.ums.service: debug
-#    com.example.tiny_demo.security.component : debug
+#logging:
+#  level:
+#    #    com.example.tiny_demo: debug
+##    com.example.tiny_demo.modules.ums.service: info
+#    com.example.tiny_demo.security.component : info
 
 ## 自定义的配置属性
 redis:

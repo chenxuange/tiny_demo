@@ -45,6 +45,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             String authToken = authHeader.substring(tokenHead.length());
             // 从jwtToken中取出用户名
             String username = jwtTokenUtil.getUserNameFromToken(authToken);
+            System.out.println();
             logger.info("jwt checking user: {}", username);
             // TODO 这里先前设置的authentication无效，是什么原因
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -62,11 +63,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 LOGGER.debug("createTimeFromToken, {}", createTimeFromToken);*/
                 // ------------------------------------
                 boolean forceInvalidFlag = jwtTokenUtil.forceInValid(authToken, userDetails);
-                logger.info("是否将token强制失效， {}", forceInvalidFlag);
+                logger.debug("是否将token强制失效: {}", forceInvalidFlag);
                 // 前一个判断是比较用户名和过期时间，后一个判断是否需要将token强制失效
                 if (jwtTokenUtil.validateToken(authToken, userDetails) && !forceInvalidFlag) {
                     String token = jwtTokenUtil.generateToken(userDetails);
-                    logger.info("authenticated user: {}", username);
+                    logger.info("authentication pass");
                     // 设置用户凭证，保存用户信息以及用户拥有的所有权限
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     // details细节信息，记录了ip地址和sessionId的值. 实际上，因为关闭了sessionManager，这里实际没啥意义，此外，RemoteIpAddress也可以通过HttpServletRequest获取

@@ -33,7 +33,7 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         List<String> allAuthorize = authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         // 访问接口需要的资源
-        logger.debug("Owned allAuthorize, {}", allAuthorize);
+        logger.debug("Authorities in authentication, {}", allAuthorize);
         for(ConfigAttribute configAttribute: configAttributes) {
             // TODO 这里有个疑问，用户拥有一定数量资源，访问当前接口所需资源 authorities 有多个,
             //  这种条件下，用户必须拥有全部的 authorities 才认为通过吗？ 暂时只要 authorities 中一条。
@@ -45,7 +45,7 @@ public class DynamicAccessDecisionManager implements AccessDecisionManager {
                 return;
             }
         }
-        logger.debug("decide failed");
+        logger.info("decide failed");
         throw new AccessDeniedException("请确认您的操作权限");
     }
 

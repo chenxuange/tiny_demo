@@ -41,7 +41,7 @@ public class DynamicSecurityFilter extends AbstractSecurityInterceptor implement
         // TODO 后续options遇检放行
         // 白名单内的直接放行, 不需要鉴权
         String requestURI = req.getRequestURI();
-        logger.debug("requestURI, {}", requestURI);
+        logger.info("request url: {}", requestURI);
         // TODO 为什么这个地方会执行两次, 一次是来的时候，一次是返回的时候
 //        logger.debug("request, {}", request);
 //        logger.debug("response, {}", response);
