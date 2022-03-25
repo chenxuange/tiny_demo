@@ -3,12 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/mall_tiny?serverTimezone=Asia/Shanghai
-    username: root
+    url: jdbc:mysql://db:3306/mall_tiny?serverTimezone=Asia/Shanghai
+    username: reader
     password: 123456
-    druid:
-      web-stat-filter:
-        enabled: true
   #    password: zzh1995@
   redis:
     host: localhost
@@ -26,7 +23,7 @@ mybatis:
 #  level:
 #    #    com.example.tiny_demo: debug
 ##    com.example.tiny_demo.modules.ums.service: info
-#    com.example.tiny_demo.security.component : info
+#    com.example.tiny_demo.security.component : debug
 
 ## 自定义的配置属性
 redis:
