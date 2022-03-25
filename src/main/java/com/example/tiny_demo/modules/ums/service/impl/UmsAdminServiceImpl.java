@@ -352,17 +352,26 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     /**
      * 根据用户名或用户id更新用户操作时间
+     * 更新用户操作时间，jwt验证时需要判断将token失效，对比了 token 中设置的创建时间和用户信息的操作时间
+     * 因此，用户信息缓存需要强制删除, 否则对比没意义
      */
     private void updateOperatorTime(Integer id, String username, Date setTime) {
         UmsAdminDO adminDO = new UmsAdminDO();
-        adminDO.setId(id);
-        adminDO.setUsername(username);
+        // 删除缓存是根据用户id的, 所以先保证找到id
+        if(id != null) {
+            adminDO.setId(id);
+        }else{
+            adminDO = adminCacheService.getAdmin(username);
+        }
+        // 更新用户操作时间前先让缓存失效
+        adminCacheService.delAdmin(adminDO.getId());
         if(setTime == null) {
             adminDO.setOperatorTime(new Date());
         }else{
             // 数据库中datetime默认对毫秒数舍并进一位的，所以实际保存时间是当前时间多一秒. 将库中该字段改为datetime(3)保留三位精度解决了
             adminDO.setOperatorTime(setTime);
         }
+        logger.info("updateOperatorTime for user, {}", adminDO.getOperatorTime().toLocaleString());
         adminMapper.updateByIdOrUsername(adminDO);
     }
 }

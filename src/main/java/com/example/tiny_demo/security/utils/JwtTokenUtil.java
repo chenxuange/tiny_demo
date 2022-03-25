@@ -141,6 +141,8 @@ public class JwtTokenUtil {
         Date createTime = getCreateTimeFromToken(token);
         LoginUserDetails loginUserDetails = (LoginUserDetails) userDetails;
         Date operatorTime = loginUserDetails.getAdmin().getOperatorTime();
+        logger.debug("getCreateTimeFromToken, {}", createTime);
+        logger.debug("operatorTime, {}", operatorTime);
         if(operatorTime != null && createTime.before(operatorTime))
             return true;
         return false;

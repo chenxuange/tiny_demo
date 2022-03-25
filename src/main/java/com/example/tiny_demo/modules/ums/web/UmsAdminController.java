@@ -126,7 +126,7 @@ public class UmsAdminController {
         }
         String name = principal.getName();
         adminService.logout(name);
-        return CommonResult.success("logout");
+        return CommonResult.success("logout for use: " + name);
     }
 
     @ApiOperation("刷新token")

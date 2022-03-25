@@ -61,10 +61,10 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
                 LOGGER.debug("operatorTime, {}", operatorTime);
                 LOGGER.debug("createTimeFromToken, {}", createTimeFromToken);*/
                 // ------------------------------------
-
-                logger.debug("是否需要将token强制失效， {}", jwtTokenUtil.forceInValid(authToken, userDetails));
+                boolean forceInvalidFlag = jwtTokenUtil.forceInValid(authToken, userDetails);
+                logger.info("是否将token强制失效， {}", forceInvalidFlag);
                 // 前一个判断是比较用户名和过期时间，后一个判断是否需要将token强制失效
-                if (jwtTokenUtil.validateToken(authToken, userDetails) && !jwtTokenUtil.forceInValid(authToken, userDetails)) {
+                if (jwtTokenUtil.validateToken(authToken, userDetails) && !forceInvalidFlag) {
                     String token = jwtTokenUtil.generateToken(userDetails);
                     logger.info("authenticated user: {}", username);
                     // 设置用户凭证，保存用户信息以及用户拥有的所有权限
