@@ -1,14 +1,23 @@
 server:
   port: 8080
+  servlet:
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+
 
 spring:
   datasource:
     url: jdbc:mysql://db:3306/mall_tiny?serverTimezone=Asia/Shanghai
+#    url: jdbc:mysql://localhost:3306/mall_tiny?serverTimezone=Asia/Shanghai
     username: reader
+#    username: root
     password: 123456
   #    password: zzh1995@
   redis:
-    host: localhost
+#    host: localhost
+    host: redis
     database: 1
     port: 6379
     password:
@@ -18,10 +27,14 @@ mybatis:
   mapper-locations:
     - classpath:/mapper/**/*.xml
 
-
-#logging:
-#  level:
-#    #    com.example.tiny_demo: debug
+logging:
+  file:
+#    path: ./logs
+    path: /var/logs
+  level:
+        com.example.tiny_demo: info
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss.SSS,CTT
 ##    com.example.tiny_demo.modules.ums.service: info
 #    com.example.tiny_demo.security.component : debug
 
@@ -59,3 +72,4 @@ secure:
       - /admin/register
       - /admin/info
       - /admin/logout
+
